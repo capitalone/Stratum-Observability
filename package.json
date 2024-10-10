@@ -1,0 +1,85 @@
+{
+  "name": "@capitalone/stratum-observability",
+  "version": "1.0.0",
+  "description": "Library for defining and publishing observability events through plugin-based architecture",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/capitalone/Stratum-Observability.git"
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/cjs/index.js"
+    },
+    "./plugin/new-relic": {
+      "types": "./dist/types/plugins/new-relic/index.d.ts",
+      "import": "./dist/esm/plugins/new-relic/index.js",
+      "default": "./dist/cjs/plugins/new-relic/index.js"
+    },
+    "./plugin/new-relic-plus": {
+      "types": "./dist/types/plugins/new-relic-plus/index.d.ts",
+      "import": "./dist/esm/plugins/new-relic-plus/index.js",
+      "default": "./dist/cjs/plugins/new-relic-plus/index.js"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:clean && npm run build:lib",
+    "build:analyze": "node scripts/analyze.js",
+    "build:clean": "rimraf dist",
+    "build:lib": "rollup -c --bundleConfigAsCjs",
+    "build:watch": "npm run build:clean && npm run build:lib -- --watch",
+    "ci:install": "npm ci && npm run website:install",
+    "lint": "eslint --config ./.eslintrc.js --max-warnings 0 'src/**/*.{js,ts}' --fix",
+    "lint:check": "eslint --config ./.eslintrc.js --max-warnings 0 'src/**/*.{js,ts}'",
+    "pre-commit": "lint-staged",
+    "prettier": "prettier '**/*.{js,ts,json}' --ignore-path ./.prettierignore --write",
+    "prettier:check": "prettier '**/*.{js,ts,json}' --ignore-path ./.prettierignore --check",
+    "test": "jest --coverage=false",
+    "test:coverage": "jest",
+    "version:major": "npm version major --no-git-tag-version",
+    "version:minor": "npm version minor --no-git-tag-version"
+  },
+  "sideEffects": false,
+  "types": "dist/types/index.d.ts",
+  "devDependencies": {
+    "@rollup/plugin-replace": "^5.0.7",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/jest": "^29.5.12",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.0.11",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.3",
+    "rollup": "^4.18.1",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "semver": "^7.6.2",
+    "shelljs": "^0.8.5",
+    "ts-jest": "^29.2.2",
+    "typescript": "^5.5.3"
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/types/index.d.ts"
+      ],
+      "plugin/new-relic": [
+        "./dist/types/plugins/new-relic/index.d.ts"
+      ],
+      "plugin/new-relic-plus": [
+        "./dist/types/plugins/new-relic-plus/index.d.ts"
+      ]
+    }
+  }
+}
