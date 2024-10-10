@@ -266,6 +266,6 @@ See the [docs](#) for more detailed usage instructions, examples, and blog posts
 ## Contributing
 We welcome and appreciate your contributions! 
 
-If you have suggestions or find a bug, please [open an issue](#).
+If you have suggestions or find a bug, please [open an issue](https://github.com/capitalone/Stratum-Observability/issues/new/choose).
 
-If you want to contribute, visit the [contributing page](#).
+If you want to contribute, visit the [contributing page](https://github.com/capitalone/Stratum-Observability/blob/main/CONTRIBUTING.md).
