@@ -260,9 +260,6 @@ export class SimplePublisher extends BasePublisherModel<SimpleEvent> {
 }
 ```
 
-## Advanced usage
-See the [docs](#) for more detailed usage instructions, examples, and blog posts.
-
 ## Contributing
 We welcome and appreciate your contributions! 
 
