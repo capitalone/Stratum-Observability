@@ -1,4 +1,4 @@
-# Contributing to DataProfiler
+# Contributions
 We love to hear feedback from the community and encourage developers to contribute back to Stratum with bugfixes, feature requests, and new plugins whenever possible.
 
 If you are looking to contribute a new feature, we recommend first implementing it as a custom plugin if possible. If you think your plugin is useful to others, let us know! We'd love to learn more and help you make it available.
