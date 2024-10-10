@@ -42,9 +42,7 @@
     "prettier": "prettier '**/*.{js,ts,json}' --ignore-path ./.prettierignore --write",
     "prettier:check": "prettier '**/*.{js,ts,json}' --ignore-path ./.prettierignore --check",
     "test": "jest --coverage=false",
-    "test:coverage": "jest",
-    "version:major": "npm version major --no-git-tag-version",
-    "version:minor": "npm version minor --no-git-tag-version"
+    "test:coverage": "jest"
   },
   "sideEffects": false,
   "types": "dist/types/index.d.ts",
