@@ -36,8 +36,8 @@ A typical Stratum implementation consists of:
    */
   export const stratumService = new StratumService({
     /**
-     * 1+ plugins defining where you'll send your events and available event schemas
-     * to ensure standardization
+     * 1+ plugins defining your standardized event schemas and how to
+     * map these schemas when published to your data collectors
      * 
      * The NewRelicPlugin is available from the @capitalone/stratum-observability library
      */
@@ -66,6 +66,7 @@ A typical Stratum implementation consists of:
     catalog: {
       tags: {
         [TagKey.LOADED]: {
+          eventType: 'base', // The base event type for Stratum events
           tagDescription: 'This application has loaded for the first time',
           tagId: 1 // Very important reference identifier -- the key to simple queries
         }
