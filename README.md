@@ -66,7 +66,6 @@ A typical Stratum implementation consists of:
     catalog: {
       tags: {
         [TagKey.LOADED]: {
-          eventType: NewRelicEventType.EVENT // Set up by the plugin to help ensure semantics of the tag at runtime
           tagDescription: 'This application has loaded for the first time',
           tagId: 1 // Very important reference identifier -- the key to simple queries
         }

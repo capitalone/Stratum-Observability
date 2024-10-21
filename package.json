@@ -18,12 +18,12 @@
       "import": "./dist/esm/index.js",
       "default": "./dist/cjs/index.js"
     },
-    "./plugin/new-relic": {
+    "./plugins/new-relic": {
       "types": "./dist/types/plugins/new-relic/index.d.ts",
       "import": "./dist/esm/plugins/new-relic/index.js",
       "default": "./dist/cjs/plugins/new-relic/index.js"
     },
-    "./plugin/new-relic-plus": {
+    "./plugins/new-relic-plus": {
       "types": "./dist/types/plugins/new-relic-plus/index.d.ts",
       "import": "./dist/esm/plugins/new-relic-plus/index.js",
       "default": "./dist/cjs/plugins/new-relic-plus/index.js"
@@ -72,10 +72,10 @@
       ".": [
         "./dist/types/index.d.ts"
       ],
-      "plugin/new-relic": [
+      "plugins/new-relic": [
         "./dist/types/plugins/new-relic/index.d.ts"
       ],
-      "plugin/new-relic-plus": [
+      "plugins/new-relic-plus": [
         "./dist/types/plugins/new-relic-plus/index.d.ts"
       ]
     }
