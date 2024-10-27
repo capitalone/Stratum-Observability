@@ -1,14 +1,14 @@
-import { BasePublisherModel, BaseTagModel } from '../base';
+import { BasePublisher, BaseEventModel } from '../base';
 import { GLOBAL_LISTENER_KEY } from '../constants';
-import type { GenericPlugin, RegisteredPlugins, StratumEventListenerFn, TagId, TagTypeModelMap } from '../types';
+import type { GenericPlugin, RegisteredPlugins, StratumSnapshotListenerFn, CatalogItemId, EventTypeModelMap } from '../types';
 import { AbTestManager } from './ab-test-manager';
-import { debugModeEnabled, generateDefaultSessionId, Logger } from './env';
-import { normalizeToArray } from './types';
+import { generateDefaultSessionId, Logger } from './env';
+import { normalizeToArray } from './general';
 
 /**
  * DI-like utility class that is created in the Stratum service.
  * This class instance serves as a singleton within each service instance and
- * is passed into child publisher and tag models.
+ * is passed into registered publishers and event models.
  *
  * Contains any shared data that should be accessible across the service instance
  * lifetime.
@@ -24,20 +24,14 @@ export class Injector {
   readonly version = '__stratumLibraryVersion__';
 
   /**
-   * Internal counter used to generate unique ids of publishers models registered
-   * within the service.
-   */
-  private n = 0;
-
-  /**
-   * Map of tag type (eventType) to associated TagModel class to
-   * instantiate tags on validation.
+   * Map of event type to aan EventModel class used to
+   * instantiate catalog items on validation.
    *
-   * As tag types are provided via plugins, they are
+   * As event types are registered via plugins, they are
    * added to this mapping.
    */
-  readonly tagTypeModelMap: TagTypeModelMap = {
-    base: { model: BaseTagModel }
+  readonly eventTypeModelMap: EventTypeModelMap = {
+    base: { model: BaseEventModel }
   };
 
   /**
@@ -72,13 +66,13 @@ export class Injector {
   stratumSessionId: string;
 
   /**
-   * List of tag ids registered via `registerTagId`. Tag
-   * ids are registered if/when a valid model is generated
+   * List of catalog item ids registered via `registerCatalogItemId`.
+   * Ids are registered if/when a valid model is generated
    * by the Stratum Service on initialization.
    */
-  registeredTagIds: {
+  registeredCatalogItemIds: {
     [key: string]: {
-      [key: TagId]: true;
+      [key: CatalogItemId]: true;
     };
   } = {};
 
@@ -104,44 +98,44 @@ export class Injector {
   }
 
   /**
-   * Given a tag id, add it to the list of
+   * Given a catalog item id, add it to the list of
    * registered ids, if it does not already exist.
    */
-  registerTagId(catalogId: string, tagId: TagId) {
-    if (!(catalogId in this.registeredTagIds)) {
-      this.registeredTagIds[catalogId] = {};
+  registerCatalogItemId(catalogId: string, id: CatalogItemId) {
+    if (!(catalogId in this.registeredCatalogItemIds)) {
+      this.registeredCatalogItemIds[catalogId] = {};
     }
-    this.registeredTagIds[catalogId][tagId] = true;
+    this.registeredCatalogItemIds[catalogId][id] = true;
   }
 
   /**
-   * Returns whether the given tag id has already
+   * Returns whether the given catalog item id has already
    * been registered by the Stratum instance.
    */
-  isTagIdRegistered(catalogId: string, tagId: TagId): boolean {
-    return !!this.registeredTagIds[catalogId] && tagId in this.registeredTagIds[catalogId];
+  isCatalogItemIdRegistered(catalogId: string, id: CatalogItemId): boolean {
+    return !!this.registeredCatalogItemIds[catalogId] && id in this.registeredCatalogItemIds[catalogId];
   }
 
   /**
-   * Register a plugin and associated models.
+   * Register a plugin and underlying models/publishers.
    *
-   * This function is responsible for populating new eventTypes within tagTypeModelMap
-   * returns a flat list of publishers models that need to be registered within the service.
+   * This function is responsible for populating new eventTypes within eventTypeModelMap
+   * returns a flat list of publishers that need to be registered within the service.
    *
    * For each publisher model:
    *   1. Attaches the respective `pluginName` value to the property of the instance
-   *   2. Overrides the acceptedTagModels property of the instance to restrict received
-   *       tags to only those provided by the plugin.
+   *   2. Overrides the acceptedEventModels property of the instance to restrict received
+   *       event models to only those provided by the plugin.
    *
    * @param {GenericPlugin} plugin - Plugin to register
    * @return Plugin output
    */
-  registerPlugin(plugin: GenericPlugin): { publishers: BasePublisherModel[] } {
-    const publishers: BasePublisherModel[] = [];
-    const acceptedTagModels: (typeof BaseTagModel)[] = [];
+  registerPlugin(plugin: GenericPlugin): { publishers: BasePublisher[] } {
+    const publishers: BasePublisher[] = [];
+    const acceptedEventModels: (typeof BaseEventModel)[] = [];
 
     if (!plugin.name || plugin.name in this.plugins) {
-      this.logger.debug(`Unable to register plugin with duplicate name "${plugin.name}"`);
+      this.logger.debug(`Unable to register plugin: duplicate name "${plugin.name}"`);
       return { publishers };
     }
 
@@ -149,22 +143,22 @@ export class Injector {
 
     if (plugin.eventTypes) {
       for (const [eventType, model] of Object.entries(plugin.eventTypes)) {
-        if (eventType in this.tagTypeModelMap) {
-          this.logger.debug(`Unable to register plugin eventType with duplicate name "${eventType}"`);
+        if (eventType in this.eventTypeModelMap) {
+          this.logger.debug(`Unable to register plugin eventType: duplicate name "${eventType}"`);
         } else {
-          this.tagTypeModelMap[eventType] = { pluginName: plugin.name, model };
-          acceptedTagModels.push(model);
+          this.eventTypeModelMap[eventType] = { pluginName: plugin.name, model };
+          acceptedEventModels.push(model);
         }
       }
     }
 
     normalizeToArray(plugin.publishers).forEach((publisher) => {
       /**
-       * If acceptedTagModels array is not specified, restrict acceptedTagModels of
-       * each publisher to the plugin's tag models.
+       * If acceptedEventModels array is not specified, restrict acceptedEventModels of all
+       * publishers to the plugin-specific events models.
        */
-      if (!Array.isArray(publisher.acceptedTagModels)) {
-        publisher.acceptedTagModels = acceptedTagModels;
+      if (!Array.isArray(publisher.acceptedEventModels)) {
+        publisher.acceptedEventModels = acceptedEventModels;
       }
       publisher.pluginName = plugin.name;
       publishers.push(publisher);
@@ -174,18 +168,11 @@ export class Injector {
   }
 
   /**
-   * Get Stratum dynamic event listener functions attached to the global parent, if any.
-   * Event listeners are either namespaced by the generated Stratum id or
+   * Get Stratum dynamic snapshot listener functions attached to globalThis, if any.
+   * These listeners are either namespaced by the StratumService id or
    * available globally for all Stratum instances to execute.
-   *
-   * If debug mode is not enabled on the global parent, this function
-   * will always return an empty array
    */
-  getExternalEventListeners(): StratumEventListenerFn[] {
-    if (!debugModeEnabled()) {
-      return [];
-    }
-
+  getExternalSnapshotListeners(): StratumSnapshotListenerFn[] {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const g = globalThis as any;
     const scopedKey = `stratum_config_${this.productName}`;
@@ -193,13 +180,5 @@ export class Injector {
       ...(Array.isArray(g[GLOBAL_LISTENER_KEY]?.listeners) ? g[GLOBAL_LISTENER_KEY].listeners : []),
       ...(Array.isArray(g[scopedKey]?.listeners) ? g[scopedKey].listeners : [])
     ];
-  }
-
-  /**
-   * Internal helper function to generate a unique id, used throughout
-   * the service.
-   */
-  getUniqueId(): number {
-    return ++this.n;
   }
 }

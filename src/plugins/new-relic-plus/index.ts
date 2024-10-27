@@ -2,7 +2,7 @@ import { BasePlugin } from '../../base';
 import type { PluginContext, PluginFactory } from '../../types';
 import { NewRelicPublisher } from '../new-relic/publisher';
 import { NewRelicEventType } from './constants';
-import { NewRelicApiResponseTagModel, NewRelicErrorTagModel, NewRelicEventTagModel } from './model';
+import { NewRelicApiResponseEventModel, NewRelicErrorEventModel, NewRelicEventModel } from './model';
 import type { NewRelicPluginOptions } from './types';
 
 /**
@@ -10,11 +10,12 @@ import type { NewRelicPluginOptions } from './types';
  *
  * This plugin is an extension of the base New Relic plugin that
  * adds support for defining custom NR-only event types within your
- * tag catalog in addition to streaming interaction events to New Relic.
+ * Stratum catalog in addition to streaming interaction events to New Relic.
  *
- * This plugin adds 2 new event types:
- *   - Base event
+ * This plugin adds 3 new event types:
+ *   - General NR event
  *   - API response
+ *   - Error event
  *
  * Use this plugin instead of NewRelicPlugin if you would like to publish
  * application-specific New Relic events. Otherwise, use the base plugin.
@@ -22,9 +23,9 @@ import type { NewRelicPluginOptions } from './types';
 export class NewRelicPlusPlugin extends BasePlugin<PluginContext, NewRelicPluginOptions> {
   name = 'newRelic'; // Same as NewRelicPlugin to prevent loading both plugins simultaneously
   eventTypes = {
-    [NewRelicEventType.API_RESPONSE]: NewRelicApiResponseTagModel,
-    [NewRelicEventType.ERROR]: NewRelicErrorTagModel,
-    [NewRelicEventType.EVENT]: NewRelicEventTagModel
+    [NewRelicEventType.API_RESPONSE]: NewRelicApiResponseEventModel,
+    [NewRelicEventType.ERROR]: NewRelicErrorEventModel,
+    [NewRelicEventType.EVENT]: NewRelicEventModel
   };
   publishers = [new NewRelicPublisher()];
   context: PluginContext = {};

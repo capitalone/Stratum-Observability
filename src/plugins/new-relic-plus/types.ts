@@ -1,4 +1,4 @@
-import type { PluginContext, PluginOptions, TagObject } from '../../types';
+import type { PluginContext, PluginOptions, CatalogItem } from '../../types';
 import type { NewRelicEventType } from './constants';
 
 /**
@@ -7,7 +7,7 @@ import type { NewRelicEventType } from './constants';
  *
  * Specified by eventType `NewRelicEventType.EVENT`
  */
-export interface NewRelicEventTagObject<T extends string = NewRelicEventType.EVENT> extends TagObject<T> {
+export interface NewRelicEvent<T extends string = NewRelicEventType.EVENT> extends CatalogItem<T> {
   /**
    * Optional property that can be used to provide context of the
    * the application state on event publish.
@@ -39,7 +39,7 @@ export interface NewRelicEventTagObject<T extends string = NewRelicEventType.EVE
  *
  * Specified by eventType `NewRelicEventType.API_RESPONSE`
  */
-export interface NewRelicApiResponseTagObject extends NewRelicEventTagObject<NewRelicEventType.API_RESPONSE> {
+export interface NewRelicApiResponseEvent extends NewRelicEvent<NewRelicEventType.API_RESPONSE> {
   /**
    * Stringified version of request headers that were sent along with the request.
    */
@@ -72,7 +72,7 @@ export interface NewRelicApiResponseTagObject extends NewRelicEventTagObject<New
  * Generic error New Relic event that should be used when recording an error was encountered.
  * Specified by eventType `NewRelicEventType.ERROR`
  */
-export interface NewRelicErrorTagObject extends NewRelicEventTagObject<NewRelicEventType.ERROR> {
+export interface NewRelicErrorEvent extends NewRelicEvent<NewRelicEventType.ERROR> {
   /**
    * Required error code string that is associated with the
    * error encountered
@@ -97,11 +97,11 @@ export interface NewRelicErrorTagObject extends NewRelicEventTagObject<NewRelicE
 }
 
 /**
- * Collection of all custom New Relic event tag objects for
- * convenience. Include this type within your TagCatalog object in
+ * Collection of all custom New Relic event objects for
+ * convenience. Include this type within your StratumCatalog object in
  * TypeScript to allow TS compilation and IDE type-hinting.
  */
-export type NewRelicTags = NewRelicEventTagObject | NewRelicApiResponseTagObject | NewRelicErrorTagObject;
+export type NewRelicEvents = NewRelicEvent| NewRelicApiResponseEvent | NewRelicErrorEvent;
 
 /**
  * Plugin options for the New Relic+ plugin. These options should be
@@ -111,7 +111,7 @@ export type NewRelicTags = NewRelicEventTagObject | NewRelicApiResponseTagObject
 export interface NewRelicPluginOptions extends PluginOptions {
   /**
    * Optional default values for one or more NewRelicContext
-   * vars
+   * vars 
    */
   defaultContext?: PluginContext;
 }

@@ -1,14 +1,14 @@
-import { BasePublisherModel, BaseTagModel } from '../base';
+import { BasePublisher, BaseEventModel } from '../base';
 import type {
-  StratumEvent,
-  TagOptionReplacement,
-  TagOptionReplacementFn,
-  TagOptions,
-  UserDefinedTagOptions
+  StratumSnapshot,
+  EventReplacement,
+  EventReplacementFn,
+  EventOptions,
+  UserDefinedEventOptions
 } from '../types';
-import { RegisteredTagCatalog } from './catalog';
+import { RegisteredStratumCatalog } from './catalog';
 import { Injector } from './injector';
-import { isDefined, isObject, safeStringify } from './types';
+import { isDefined, isObject, safeStringify } from './general';
 
 /**
  * Utility function to deep clone a given variable.
@@ -30,14 +30,14 @@ export function clone<T>(source: T): T {
 }
 
 /**
- * Given an object, search through keys for dynamic placeholders $\\{...\\} and replace values
+ * Given an object, search through keys for dynamic placeholders {{ ... }} and replace values
  * based on those found in the given replacement map.
  *
  * If the replacement of a given key is a function, replace the placeholder with the return
- * value of the function, given an instance of the underlying tag model.
+ * value of the function, given an instance of the underlying event model.
  */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export function performReplacements(model: BaseTagModel, obj: any, map: { [key: string]: TagOptionReplacement }): void {
+export function performReplacements(model: BaseEventModel, obj: any, map: { [key: string]: EventReplacement }): void {
   if (!isObject(obj)) {
     return;
   }
@@ -45,9 +45,9 @@ export function performReplacements(model: BaseTagModel, obj: any, map: { [key: 
     if (typeof obj[prop] === 'string') {
       Object.keys(map).forEach((search) => {
         if (typeof map[search] === 'function') {
-          obj[prop] = (<TagOptionReplacementFn>map[search])(model);
+          obj[prop] = (<EventReplacementFn>map[search])(model);
         } else {
-          obj[prop] = obj[prop].replace(new RegExp('\\${' + search + '}', 'g'), map[search]);
+          obj[prop] = obj[prop].replace(new RegExp('{{' + search + '}}', 'g'), map[search]);
         }
       });
     } else if (isObject(obj[prop])) {
@@ -57,18 +57,18 @@ export function performReplacements(model: BaseTagModel, obj: any, map: { [key: 
 }
 
 /**
- * Helper method to generate a Stratum event given a tag model and a set
- * of tag options. Stratum events are sent to event listeners independently of
- * publisher logic.
+ * Helper method to generate a Stratum snapshot given an event model and a set
+ * of event options. Stratum snapshot are sent to snapshot listeners independently of
+ * plugin/publisher logic.
  */
-export function generateStratumEvent(
+export function generateStratumSnapshot(
   injector: Injector,
-  tag: BaseTagModel,
-  catalog: RegisteredTagCatalog,
-  publishers: BasePublisherModel[],
-  options?: Partial<TagOptions>
-): StratumEvent {
-  const plugins: StratumEvent['plugins'] = {};
+  model: BaseEventModel,
+  catalog: RegisteredStratumCatalog,
+  publishers: BasePublisher[],
+  options?: Partial<EventOptions>
+): StratumSnapshot {
+  const plugins: StratumSnapshot['plugins'] = {};
   publishers.forEach((publisher) => {
     if (publisher.pluginName && publisher.pluginName in injector.plugins) {
       const plugin = injector.plugins[publisher.pluginName];
@@ -79,7 +79,7 @@ export function generateStratumEvent(
     }
   });
 
-  const globalContext: StratumEvent['globalContext'] = {};
+  const globalContext: StratumSnapshot['globalContext'] = {};
   Object.keys(injector.plugins).forEach((pluginName) => {
     const plugin = injector.plugins[pluginName];
     if (typeof plugin.context === 'object') {
@@ -93,56 +93,55 @@ export function generateStratumEvent(
     }
   });
 
-  const clone = cloneStratumEvent({
+  const clone = cloneStratumSnapshot({
     abTestSchemas: injector.abTestManager.generateContexts(options?.abTestSchemas),
     catalog: {
       metadata: catalog.metadata,
       id: catalog.id
     },
     stratumSessionId: injector.stratumSessionId,
-    data: tag.getData(options),
+    data: model.getData(options),
     globalContext,
     plugins,
     productName: injector.productName,
     productVersion: injector.productVersion,
     stratumVersion: injector.version,
-    tag: {
-      displayName: tag.displayableName,
-      eventType: tag.eventType,
-      id: tag.tagId
+    event: {
+      eventType: model.eventType,
+      id: model.id
     },
-    tagOptions: options
+    eventOptions: options
   });
 
   return clone;
 }
 
 /**
- * Since StratumEvents contain nested objects that can be updated before
- * the event is read asynchronously, we deep-clone the event to create a
+ * Since StratumSnapshots contain nested objects that can be updated before
+ * the event is processed asynchronously, we deep-clone the event to create a
  * "snapshot" at the time of creation.
  */
-export function cloneStratumEvent(event: StratumEvent): StratumEvent {
+export function cloneStratumSnapshot(event: StratumSnapshot): StratumSnapshot {
   return JSON.parse(safeStringify(event));
 }
 
 /**
- * Populate dynamic tag options based on the tag model and
- * publisher model.
+ * Populate dynamic event options based on the event model and
+ * publisher.
  *
- * If publisher and tag belong to the same plugin, move any
+ * If publisher and event belong to the same plugin, move any
  * plugin-specific data from incomingOptions into
- * `TagOptions.data`
+ * `EventOptions.data`
  *
- * @param {BasePublisherModel} publisher - Publisher model to publish tag
- * @param {Partial<UserDefinedTagOptions>} incomingOptions - User-defined tag options provided to tag/publisher
- * @return {Partial<TagOptions>} Processed tag options
+ * @param {BasePublisher} publisher - Publisher instance to publish the specific event
+ * @param {Partial<UserDefinedEventOptions>} incomingOptions - User-defined event options provided
+ * @return {Partial<EventOptions>} Processed event options
  */
-export function populateDynamicTagOptions(
-  publisher: BasePublisherModel,
-  incomingOptions?: Partial<UserDefinedTagOptions>
-): Partial<TagOptions> {
-  const options: Partial<TagOptions> = Object.assign({}, incomingOptions ?? {});
+export function populateDynamicEventOptions(
+  publisher: BasePublisher,
+  incomingOptions?: Partial<UserDefinedEventOptions>
+): Partial<EventOptions> {
+  const options: Partial<EventOptions> = Object.assign({}, incomingOptions ?? {});
   if (publisher.pluginName && isDefined(options.pluginData) && publisher.pluginName in options.pluginData) {
     options.data = options.pluginData[publisher.pluginName];
   }

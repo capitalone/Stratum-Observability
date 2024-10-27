@@ -1,26 +1,24 @@
-import type { TagKey, TagObject, TagOptions } from '../types';
-import { Injector } from '../utils/injector';
-import { clone, performReplacements } from '../utils/tag';
+import type { CatalogKey, CatalogItem, EventOptions } from '../types';
+import { clone, Injector, performReplacements } from '../utils';
 
 /**
- * Tag model classes serve as wrapper of the underlying TagObject
- * interface to centralize shared logic between tags. The type of
- * the underlying tag is dependent on the class. There should be a
- * corresponding TagModel class extending from BaseTagModel for
- * each TagObject interface.
+ * Event models serve as a wrapper of an underlying CatalogItem instance
+ * interface to centralize shared logic between event types.
+ * There should be a corresponding EventModel class extending from
+ * BaseEventModel for each CatalogItem eventType.
  */
-export class BaseTagModel<T extends TagObject = TagObject> {
+export class BaseEventModel<T extends CatalogItem = CatalogItem> {
   /**
-   * Stored value indicating that key used by the external
-   * application to reference the tag object.
+   * Stored value indicating the key used by the external
+   * application to reference the cataloge item.
    */
-  protected readonly key: TagKey;
+  protected readonly key: CatalogKey;
 
   /**
-   * Underlying tag object data that populates the tag model. This
-   * is received from the tag catalog on model load.
+   * Underlying catalog item data that populates the event model. This
+   * is received from the catalog on model load.
    */
-  protected tag: T;
+  protected item: T;
 
   /**
    * Reference to the Injector class instantiated
@@ -29,108 +27,89 @@ export class BaseTagModel<T extends TagObject = TagObject> {
   protected injector: Injector;
 
   /**
-   * Flag indicating whether underlying TagObject passes
-   * validation rules. Populated in constructor after
+   * Flag indicating whether the underlying catalog item passes
+   * validation rules. Populated in the constructor after
    * checkValidity is called.
    */
   private _isValid = false;
 
   /**
-   * ID of the catalog that owns this tag.
+   * ID of the catalog that owns this catalog item.
    */
   catalogId: string;
 
   /**
    * Any validation errors encountered while determining
-   * the validity of the tag. Invalid tags are not guaranteed to
-   * have associated errors since these messages are used for
-   * debugging only.
-   *
-   * The isValid flag is still used to determine the tag's
-   * validity.
+   * the validity of the catalog item. Invalid catalog items
+   * are not guaranteed to have associated errors as these
+   * messages are used for debugging only.
    */
   validationErrors: string[] = [];
 
   /**
-   * The underlying eventType of the tag object that
-   * was mapped to this model instance.
+   * The underlying eventType of the catalog item that
+   * was mapped to this model instance by a registered plugin.
    */
   eventType: string;
 
   /**
-   * Check validity of underlying tag object data
-   *
-   * Although tag type is unknown, we can assume that the
-   * TagObject is of the associated type corresponding to
-   * the model class that is instantiated. This logic
-   * is provided by StratumService.
+   * Checks validity of underlying catalog item data
    */
-  constructor(key: TagKey, tag: T, catalogId: string, injector: Injector) {
+  constructor(key: CatalogKey, item: T, catalogId: string, injector: Injector) {
     this.key = key;
-    this.tag = clone(tag);
+    this.item = clone(item);
     this.catalogId = catalogId;
     this.injector = injector;
-    this.eventType = this.tag.eventType;
+    this.eventType = this.item.eventType;
     this._isValid = this.checkValidity();
   }
 
   /**
-   * Get displayable name of the tag model based on the underlying tag content.
-   * This value is typically used in debugging text and scripts within the service.
-   */
-  get displayableName() {
-    return `Tag Key "${this.key}" (Type: "${this.eventType}"` + (this.tagId ? `, ID: "${this.tagId}"` : '') + ')';
-  }
-
-  /**
-   * Getter function to return whether or not underlying TagObject
-   * pass validation checks.
+   * Getter function to return whether or not the catalog item
+   * passes the event model validation checks.
    */
   get isValid() {
     return this._isValid;
   }
 
   /**
-   * Getter function to return the underlying tagId of
-   * the tag.
+   * Getter function to return the id of the catalog item.
    */
-  get tagId() {
-    return this.tag.tagId;
+  get id() {
+    return this.item.id;
   }
 
   /**
    * Function that provides the logic to check if the underlying
-   * TagObject contains valid data (run-time checking). This
+   * catalog item contains valid data (run-time checking). This
    * validation is performed on class instantiation.
    *
    * This function should make use of/mirror the inheritance of the
-   * underlying TagObject types. Check validation rules directly
-   * associated with the TagObject type only. Rely on inheritance
-   * to check parent logic.
+   * underlying event types.
    */
   protected checkValidity(): boolean {
-    if (!this.tag || typeof this.tag !== 'object') {
-      this.addValidationError('An unexpected format for the tag was encountered. Tag could not be processed.');
+    if (!this.item || typeof this.item !== 'object') {
+      this.addValidationError('Catalog item has an unexpected format');
       return false;
     }
 
     let isValid = true;
 
     if (
-      (typeof this.tag.tagId !== 'number' && typeof this.tag.tagId !== 'string') ||
-      (typeof this.tag.tagId === 'number' && this.tag.tagId < 0) ||
-      (typeof this.tag.tagId === 'string' && !this.tag.tagId)
+      (typeof this.id !== 'number' && typeof this.id !== 'string') ||
+      (typeof this.id === 'number' && this.id < 0) ||
+      (typeof this.id === 'string' && !this.id)
     ) {
       isValid = false;
-      this.addValidationError('An invalid tagId was provided');
+      this.addValidationError('An invalid id was provided');
     }
-    if (this.injector.isTagIdRegistered(this.catalogId, this.tag.tagId)) {
+    if (this.injector.isCatalogItemIdRegistered(this.catalogId, this.id)) {
       isValid = false;
-      this.addValidationError(`Duplicate tagId "${this.tag.tagId}" in catalog "${this.catalogId}"`);
+      this.addValidationError(`Duplicate id "${this.id}" in catalog "${this.catalogId}"`);
     }
-    if (typeof this.tag.tagDescription !== 'string' || !this.tag.tagDescription) {
+    if (typeof this.item.description !== 'string') {
       isValid = false;
-      this.addValidationError('Tag description must be provided');
+      this.addValidationError('An invalid description was provided');
     }
 
     return isValid;
@@ -145,19 +124,19 @@ export class BaseTagModel<T extends TagObject = TagObject> {
   }
 
   /**
-   * Function to return data from the TagModel to a PublisherModel or
-   * for additional debugging purposes. This function is the main way
-   * the data is exposed outside the model to other parts of the service.
+   * Function to return data from the EventModel to a publisher.
+   * This function is the main way the data is exposed outside the model
+   * to other parts of the service.
    *
-   * The underlying TagObject data is cloned to avoid changing the data
-   * when its mapped by the specific publisher.
+   * The underlying catalog item data is cloned to avoid changing the data
+   * when it's mapped by a publisher.
    */
-  getData(options?: Partial<TagOptions>) {
+  getData(options?: Partial<EventOptions>) {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    const tag = clone<any>(this.tag);
+    const item = clone<any>(this.item);
     if (options?.replacements) {
-      performReplacements(this, tag, options.replacements);
+      performReplacements(this, item, options.replacements);
     }
-    return tag;
+    return item;
   }
 }

@@ -10,12 +10,6 @@ export const STORED_SESSION_ID_KEY = 'stm_internal_id';
 export const DEBUG_KEY = 'stratumdb';
 
 /**
- * Session storage key that controls whether stratum logs events
- * to the console on publish.
- */
-export const AUTO_LOGGING_KEY = 'stratum_log_console';
-
-/**
  * Key on the globalThis object that stratum will check for when
  * looking for event listener callbacks.
  *

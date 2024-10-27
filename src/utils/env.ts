@@ -1,10 +1,9 @@
-import { AUTO_LOGGING_KEY, DEBUG_KEY, GLOBAL_LISTENER_KEY, STORED_SESSION_ID_KEY } from '../constants';
-import type { StratumEventListenerFn } from '../types';
-import { isDefined } from './types';
+import { DEBUG_KEY, GLOBAL_LISTENER_KEY, STORED_SESSION_ID_KEY } from '../constants';
+import type { StratumSnapshotListenerFn } from '../types';
+import { isDefined } from './general';
 
 /**
- * Helper function to append a given listener callback function to the
- * globalThis (or given parent) object.
+ * Helper function to append a given listener callback function to globalThis (or provided).
  * Expected keys:
  *  - `stratum_config_${STRATUM_ID}` - if listener should be scoped to a given application
  *  - `stratum_global` - if listener should be called on any stratum instance available
@@ -12,7 +11,7 @@ import { isDefined } from './types';
  * @return {boolean} Returns whether the attempt to set the provided function was successful
  */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-function _instantiateStratumEventListener(key: string, fn: StratumEventListenerFn, host?: any): boolean {
+function _instantiateStratumSnapshotListener(key: string, fn: StratumSnapshotListenerFn, host?: any): boolean {
   try {
     if (!isDefined(host)) {
       host = globalThis;
@@ -31,46 +30,41 @@ function _instantiateStratumEventListener(key: string, fn: StratumEventListenerF
 }
 
 /**
- * Function to add a Stratum event listener callback
+ * Function to add a Stratum snapshot listener callback
+ * function to a parent.
+ *
+ * The provided function will be executed each time a 
+ * StratumService with a matching id publishes an event.
+ *
+ * Using this function ensures that any other listeners added in
+ * parallel will not be accidentally overwritten.
+ *
+ * @return {boolean} Returns whether the attempt to set the provided function was successful
+ */
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export function addStratumSnapshotListener(id: string, fn: StratumSnapshotListenerFn, host?: any): boolean {
+  return _instantiateStratumSnapshotListener(`stratum_config_${id}`, fn, host);
+}
+
+/**
+ * Global function to add a Stratum snapshot listener callback
  * function to the global parent, if available.
  *
- * The provided function will be executed each time your
- * product's Stratum service publishes a tag (based on
- * matching product names).
+ * The provided function will be executed any time any event is
+ * published within the specified parent (or globalThis, if unspecified)
  *
- * You can also choose to set up the event listener directly
- * on the global parent object. However, using this function is safer
- * since it ensures that other event listeners set up on
- * the service in parallel will not be accidentally overwritten.
+ * Using this function ensures that any other listeners added in
+ * parallel will not be accidentally overwritten.
  *
  * @return {boolean} Returns whether the attempt to set the provided function was successful
  */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export function addStratumEventListener(id: string, fn: StratumEventListenerFn, host?: any): boolean {
-  return _instantiateStratumEventListener(`stratum_config_${id}`, fn, host);
+export function addGlobalStratumSnapshotListener(fn: StratumSnapshotListenerFn, host?: any): boolean {
+  return _instantiateStratumSnapshotListener(GLOBAL_LISTENER_KEY, fn, host);
 }
 
 /**
- * Global function to add a Stratum event listener callback
- * function to the global parent object, if available.
- *
- * The provided function will be executed any time any Stratum
- * instance within the given host publishes.
- *
- * You can also choose to set up the event listener directly
- * on the global parent object. However, using this function is safer
- * since it ensures that other event listeners set up on
- * the service in parallel will not be accidentally overwritten.
- *
- * @return {boolean} Returns whether the attempt to set the provided function was successful
- */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export function addGlobalStratumEventListener(fn: StratumEventListenerFn, host?: any): boolean {
-  return _instantiateStratumEventListener(GLOBAL_LISTENER_KEY, fn, host);
-}
-
-/**
- * Function to generate a new span id using Stratum's default
+ * Function to generate a new id using Stratum's default
  * session id logic.
  *
  * Returns a UUID, preferring a session storage value if present.
@@ -94,23 +88,12 @@ export function generateDefaultSessionId(): string {
 }
 
 /**
- * Utility class to write to the console. This class should be used to
- * emit any logs instead of relying on the actual console object.
+ * Utility class to write to the console.
  *
  * This class serves as a layer so that logs emitted throughout
  * the package are subject to debug mode checks.
  */
 export class Logger {
-  /**
-   * Write logs to the console only if auto-logging is
-   * turned on
-   */
-  autoLog(...args: unknown[]) {
-    if (autoLoggingEnabled()) {
-      console.log('[Stratum]', ...args);
-    }
-  }
-
   /**
    * Write warnings to the console only if debug mode is enabled
    */
@@ -123,7 +106,7 @@ export class Logger {
 
 /**
  * Utility function to check if the Stratum debug key is
- * set in local storage.
+ * set in session storage.
  *
  * If debug mode is enabled, logging output will be sent to the
  * console and custom event listeners will be enabled.
@@ -133,23 +116,6 @@ export class Logger {
 export function debugModeEnabled(): boolean {
   try {
     return sessionStorage.getItem(DEBUG_KEY)?.toLowerCase() === 'true';
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Utility function to check if Stratum's auto logging key
- * is set in local storage.
- *
- * If auto logging is enabled, stratum events will be logged
- * to the console on publish
- *
- * @return {boolean} Flag indicating if auto logging is enabled.
- */
-export function autoLoggingEnabled(): boolean {
-  try {
-    return sessionStorage.getItem(AUTO_LOGGING_KEY)?.toLowerCase() === 'true';
   } catch {
     return false;
   }

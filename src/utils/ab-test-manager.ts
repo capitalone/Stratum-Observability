@@ -1,5 +1,5 @@
 import type { AbTest, AbTestCollection, AbTestSchema } from '../types';
-import { isDefined } from './types';
+import { isDefined } from './general';
 
 /**
  * Singleton instance used to collect and manage AbTest schemas

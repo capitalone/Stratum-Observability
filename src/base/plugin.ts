@@ -1,18 +1,14 @@
 import { PluginContext, PluginOptions } from '../types';
 import { Injector } from '../utils';
-import { BaseTagModel } from './model';
-import { BasePublisherModel } from './publisher';
+import { BaseEventModel } from './model';
+import { BasePublisher } from './publisher';
 
 /**
- * A plugin is composed of one or more custom tag models (with
- * tag catalog entries) and publisher models.
+ * A plugin is composed of one or more custom event models and
+ * publisher models.
  *
- * Plugins can be used to leverage the tag catalog functionality
- * in a new way or to override the default behavior of default
- * tags/publishers.
- *
- * New plugins should avoid exporting Plugin objects directly
- * and use a PluginFactory definition to do so.
+ * Plugins can be used to define new and custom catalogs behaviors
+ * and integrations.
  */
 export abstract class BasePlugin<T extends PluginContext, U extends PluginOptions> {
   /**
@@ -20,34 +16,34 @@ export abstract class BasePlugin<T extends PluginContext, U extends PluginOption
    * for all plugins passed into the service instance.
    *
    * This value is used to specify custom dynamic data to
-   * pass to plugin publishers via TagOptions.pluginData.
+   * pass to plugin publishers via CatalogItemOptions.pluginData.
    */
   abstract name: string;
 
   /**
-   * One or more publisher models to register within the
-   * service. The publishers will only accept tags from
-   * the given eventTypes.
+   * One or more publishers to register within the
+   * service. The publishers will only accept catalog items from
+   * the defined eventTypes.
    */
-  publishers?: BasePublisherModel[];
+  publishers?: BasePublisher[];
 
   /**
-   * Mapping of eventTypes strings in plugin tags to
-   * respective tag model.
+   * Mapping of eventTypes strings in catalog items to a
+   * respective event model.
    *
    * If defined as:
    * ```
    * {
-   *   simple: SimpleTagModel
+   *   simple: SimpleEventModel
    * }
    * ```
    *
-   * then any tag entry with `eventType: 'simple'` will
-   * will be added to the service as a SimpleTagModel
+   * then any catalog item with `eventType: 'simple'` will
+   * will be registered in Stratum as a SimpleEventModel
    * instance.
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  eventTypes?: { [key: string]: typeof BaseTagModel<any> };
+  eventTypes?: { [key: string]: typeof BaseEventModel<any> };
 
   /**
    * Additional options to pass into the plugin on
@@ -73,9 +69,10 @@ export abstract class BasePlugin<T extends PluginContext, U extends PluginOption
    *
    * The global context is a collection of all
    * plugin context vars active on the stratum
-   * service instance. Plugins may use this data to be
-   * context-aware even when a specific plugin does not apply to
-   * the tag being published.
+   * service instance.
+   * 
+   * Plugins may use this data to be context-aware even when a
+   * specific plugin does not apply to the event being published.
    */
   useGlobalContextPrefix = true;
 

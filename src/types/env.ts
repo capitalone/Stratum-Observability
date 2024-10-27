@@ -1,10 +1,10 @@
 import type { AbTestSchema } from './ab-test';
 import type { PluginContext, PluginOptions } from './plugin';
-import type { TagCatalogMetadata, TagId, TagOptions } from './tag';
+import type { CatalogMetadata, CatalogItemId, EventOptions } from './catalog';
 
 /**
- * Snapshot view of Stratum properties associated
- * with a tag on publish.
+ * Snapshot view of all Stratum properties associated
+ * with an event on publish.
  *
  * 1) Passed to any registered dynamic event listener
  *    functions
@@ -12,11 +12,11 @@ import type { TagCatalogMetadata, TagId, TagOptions } from './tag';
  *    at time of initial publish call
  * 2) Used by dev tooling to debug Stratum data
  */
-export interface StratumEvent {
+export interface StratumSnapshot {
   abTestSchemas: AbTestSchema[];
   catalog: {
     id: string;
-    metadata: TagCatalogMetadata;
+    metadata: CatalogMetadata;
   };
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   data: any;
@@ -24,11 +24,11 @@ export interface StratumEvent {
   /**
    * Snapshot of context data stored across all plugins, whether
    * associated with the specific eventType or not. This is used
-   * by plugins like New Relic that add observability to the
-   * overall data stored.
+   * by plugins that add global observability to the
+   * all data stored by the library at a point-in-time.
    *
-   * In most cases, do not use this. Rely on the purely-associated
-   * plugin data instead.
+   * In most cases, you won't need  to use this. Rely on the data
+   * associated to the associated plugin instead.
    */
   globalContext: {
     [pluginName: string]: {
@@ -41,39 +41,37 @@ export interface StratumEvent {
   productVersion: string;
 
   /**
-   * Plugin data ONLY for plugins associated with the
+   * Plugin data for ONLY plugins associated with the
    * event (aka at least one publisher in the plugin passes
-   * the `shouldPublishTag` hook.)
+   * the `shouldPublishEvent` hook.)
    */
   plugins: {
-    [pluginName: string]: StratumEventPluginData;
+    [pluginName: string]: StratumSnapshotPluginData;
   };
 
   stratumSessionId: string;
   stratumVersion: string;
-  tag: {
-    displayName: string;
+  event: {
     eventType: string;
-    id: TagId;
+    id: CatalogItemId;
   };
-  tagOptions?: Partial<TagOptions>;
+  eventOptions?: Partial<EventOptions>;
 }
 
 /**
- * Plugin data saved and cloned within published StratumEvents
+ * Plugin data saved and cloned within published StratumSnapshots
  */
-export interface StratumEventPluginData {
+export interface StratumSnapshotPluginData {
   context: PluginContext;
   options: PluginOptions;
 }
 
 /**
- * Callback functions that can be added to Stratum
- * to add one-off event listeners to Stratum, typically for
- * debugging purposes.
+ * Callback functions that can be added as one-off event
+ * listeners to Stratum for debugging purposes.
  *
  * Once registered within Stratum, these functions are executed
- * every time publishTag is called on the service, passing along the
- * underlying Stratum event data.
+ * every time publish() is called on the service, passing along the
+ * underlying Stratum snapshot data.
  */
-export type StratumEventListenerFn = (event: StratumEvent) => void;
+export type StratumSnapshotListenerFn = (event: StratumSnapshot) => void;
