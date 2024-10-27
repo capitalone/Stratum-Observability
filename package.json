@@ -39,6 +39,7 @@
     "lint": "eslint --config ./.eslintrc.js --max-warnings 0 'src/**/*.{js,ts}' --fix",
     "lint:check": "eslint --config ./.eslintrc.js --max-warnings 0 'src/**/*.{js,ts}'",
     "pre-commit": "lint-staged",
+    "prepare": "husky",
     "prettier": "prettier '**/*.{js,ts,json}' --ignore-path ./.prettierignore --write",
     "prettier:check": "prettier '**/*.{js,ts,json}' --ignore-path ./.prettierignore --check",
     "test": "jest --coverage=false",
