@@ -1,5 +1,6 @@
 import type { CatalogKey, CatalogItem, EventOptions } from '../types';
-import { clone, Injector, performReplacements } from '../utils';
+import { clone, performReplacements } from '../utils/event';
+import { Injector } from '../utils/injector';
 
 /**
  * Event models serve as a wrapper of an underlying CatalogItem instance
