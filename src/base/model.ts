@@ -1,14 +1,14 @@
-import type { CatalogKey, CatalogItem, EventOptions } from '../types';
+import type { CatalogEvent, CatalogKey, EventOptions } from '../types';
 import { clone, performReplacements } from '../utils/event';
 import { Injector } from '../utils/injector';
 
 /**
- * Event models serve as a wrapper of an underlying CatalogItem instance
+ * Event models serve as a wrapper of an underlying CatalogEvent instance
  * interface to centralize shared logic between event types.
  * There should be a corresponding EventModel class extending from
- * BaseEventModel for each CatalogItem eventType.
+ * BaseEventModel for each CatalogEvent eventType.
  */
-export class BaseEventModel<T extends CatalogItem = CatalogItem> {
+export class BaseEventModel<T extends CatalogEvent = CatalogEvent> {
   /**
    * Stored value indicating the key used by the external
    * application to reference the cataloge item.
@@ -104,7 +104,7 @@ export class BaseEventModel<T extends CatalogItem = CatalogItem> {
       isValid = false;
       this.addValidationError('An invalid id was provided');
     }
-    if (this.injector.isCatalogItemIdRegistered(this.catalogId, this.id)) {
+    if (this.injector.isEventIdRegistered(this.catalogId, this.id)) {
       isValid = false;
       this.addValidationError(`Duplicate id "${this.id}" in catalog "${this.catalogId}"`);
     }

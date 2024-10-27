@@ -1,5 +1,5 @@
-import type { GenericPlugin } from './plugin';
 import type { DefaultCatalogOptions } from './catalog';
+import type { GenericPlugin } from './plugin';
 
 /**
  * Options passed into the StratumService on initialization.

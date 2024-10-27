@@ -2,18 +2,18 @@ import { BasePublisher } from './base';
 import type {
   AbTest,
   AbTestSchema,
+  CatalogKey,
   GenericPlugin,
   StratumServiceOptions,
-  CatalogKey,
+  StratumSnapshotListenerFn,
   UserDefinedCatalogOptions,
-  UserDefinedEventOptions,
-  StratumSnapshotListenerFn
+  UserDefinedEventOptions
 } from './types';
 import { cloneStratumSnapshot, generateStratumSnapshot, populateDynamicEventOptions } from './utils';
 import { generateCatalogId, RegisteredStratumCatalog } from './utils/catalog';
 import { addStratumSnapshotListener } from './utils/env';
-import { Injector } from './utils/injector';
 import { normalizeToArray } from './utils/general';
+import { Injector } from './utils/injector';
 
 /**
  * The main Stratum service class. This class is the main entry point for the
@@ -122,7 +122,7 @@ export class StratumService {
   removeCatalog(id: string) {
     if (id in this.catalogs) {
       delete this.catalogs[id];
-      delete this.injector.registeredCatalogItemIds[id];
+      delete this.injector.registeredEventIds[id];
     }
     if (this.defaultCatalog && this.defaultCatalog.id === id) {
       delete this.defaultCatalog;
@@ -186,7 +186,11 @@ export class StratumService {
    * @return {Promise<boolean>} - This promise will always resolve with a boolean representing
    *  the success of the publisher
    */
-  async publishFromCatalog(catalogId: string, key: CatalogKey, options?: Partial<UserDefinedEventOptions>): Promise<boolean> {
+  async publishFromCatalog(
+    catalogId: string,
+    key: CatalogKey,
+    options?: Partial<UserDefinedEventOptions>
+  ): Promise<boolean> {
     const catalog = this.catalogs[catalogId];
     if (!catalog || !catalog.validModels[key]) {
       this.injector.logger.debug(`Unable to publish "${key}": key not found or invalid`);
@@ -238,7 +242,9 @@ export class StratumService {
                 await publisher.publish(content, internalSnapshot);
                 resolve();
               } else {
-                this.injector.logger.debug(`Unable to publish "${key}": Publisher "${publisher.name}" is not available`)
+                this.injector.logger.debug(
+                  `Unable to publish "${key}": Publisher "${publisher.name}" is not available`
+                );
                 reject();
               }
             });

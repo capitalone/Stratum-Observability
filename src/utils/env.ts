@@ -33,7 +33,7 @@ function _instantiateStratumSnapshotListener(key: string, fn: StratumSnapshotLis
  * Function to add a Stratum snapshot listener callback
  * function to a parent.
  *
- * The provided function will be executed each time a 
+ * The provided function will be executed each time a
  * StratumService with a matching id publishes an event.
  *
  * Using this function ensures that any other listeners added in

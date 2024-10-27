@@ -1,6 +1,6 @@
 import type { AbTestSchema } from './ab-test';
+import type { CatalogMetadata, EventId, EventOptions } from './catalog';
 import type { PluginContext, PluginOptions } from './plugin';
-import type { CatalogMetadata, CatalogItemId, EventOptions } from './catalog';
 
 /**
  * Snapshot view of all Stratum properties associated
@@ -53,7 +53,7 @@ export interface StratumSnapshot {
   stratumVersion: string;
   event: {
     eventType: string;
-    id: CatalogItemId;
+    id: EventId;
   };
   eventOptions?: Partial<EventOptions>;
 }

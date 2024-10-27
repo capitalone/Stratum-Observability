@@ -1,14 +1,14 @@
-import { BasePublisher, BaseEventModel } from '../base';
+import { BaseEventModel, BasePublisher } from '../base';
 import type {
-  StratumSnapshot,
+  EventOptions,
   EventReplacement,
   EventReplacementFn,
-  EventOptions,
+  StratumSnapshot,
   UserDefinedEventOptions
 } from '../types';
 import { RegisteredStratumCatalog } from './catalog';
-import { Injector } from './injector';
 import { isDefined, isObject, safeStringify } from './general';
+import { Injector } from './injector';
 
 /**
  * Utility function to deep clone a given variable.

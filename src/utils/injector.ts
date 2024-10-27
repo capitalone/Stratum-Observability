@@ -1,6 +1,6 @@
-import { BasePublisher, BaseEventModel } from '../base';
+import { BaseEventModel, BasePublisher } from '../base';
 import { GLOBAL_LISTENER_KEY } from '../constants';
-import type { GenericPlugin, RegisteredPlugins, StratumSnapshotListenerFn, CatalogItemId, EventTypeModelMap } from '../types';
+import type { EventId, EventTypeModelMap, GenericPlugin, RegisteredPlugins, StratumSnapshotListenerFn } from '../types';
 import { AbTestManager } from './ab-test-manager';
 import { generateDefaultSessionId, Logger } from './env';
 import { normalizeToArray } from './general';
@@ -66,13 +66,13 @@ export class Injector {
   stratumSessionId: string;
 
   /**
-   * List of catalog item ids registered via `registerCatalogItemId`.
+   * List of catalog item ids registered via `registerEventId`.
    * Ids are registered if/when a valid model is generated
    * by the Stratum Service on initialization.
    */
-  registeredCatalogItemIds: {
+  registeredEventIds: {
     [key: string]: {
-      [key: CatalogItemId]: true;
+      [key: EventId]: true;
     };
   } = {};
 
@@ -101,19 +101,19 @@ export class Injector {
    * Given a catalog item id, add it to the list of
    * registered ids, if it does not already exist.
    */
-  registerCatalogItemId(catalogId: string, id: CatalogItemId) {
-    if (!(catalogId in this.registeredCatalogItemIds)) {
-      this.registeredCatalogItemIds[catalogId] = {};
+  registerEventId(catalogId: string, id: EventId) {
+    if (!(catalogId in this.registeredEventIds)) {
+      this.registeredEventIds[catalogId] = {};
     }
-    this.registeredCatalogItemIds[catalogId][id] = true;
+    this.registeredEventIds[catalogId][id] = true;
   }
 
   /**
    * Returns whether the given catalog item id has already
    * been registered by the Stratum instance.
    */
-  isCatalogItemIdRegistered(catalogId: string, id: CatalogItemId): boolean {
-    return !!this.registeredCatalogItemIds[catalogId] && id in this.registeredCatalogItemIds[catalogId];
+  isEventIdRegistered(catalogId: string, id: EventId): boolean {
+    return !!this.registeredEventIds[catalogId] && id in this.registeredEventIds[catalogId];
   }
 
   /**

@@ -1,4 +1,4 @@
-import type { PluginContext, PluginOptions, CatalogItem } from '../../types';
+import type { CatalogEvent, PluginContext, PluginOptions } from '../../types';
 import type { NewRelicEventType } from './constants';
 
 /**
@@ -7,7 +7,7 @@ import type { NewRelicEventType } from './constants';
  *
  * Specified by eventType `NewRelicEventType.EVENT`
  */
-export interface NewRelicEvent<T extends string = NewRelicEventType.EVENT> extends CatalogItem<T> {
+export interface NewRelicEvent<T extends string = NewRelicEventType.EVENT> extends CatalogEvent<T> {
   /**
    * Optional property that can be used to provide context of the
    * the application state on event publish.
@@ -101,7 +101,7 @@ export interface NewRelicErrorEvent extends NewRelicEvent<NewRelicEventType.ERRO
  * convenience. Include this type within your StratumCatalog object in
  * TypeScript to allow TS compilation and IDE type-hinting.
  */
-export type NewRelicEvents = NewRelicEvent| NewRelicApiResponseEvent | NewRelicErrorEvent;
+export type NewRelicEvents = NewRelicEvent | NewRelicApiResponseEvent | NewRelicErrorEvent;
 
 /**
  * Plugin options for the New Relic+ plugin. These options should be
@@ -111,7 +111,7 @@ export type NewRelicEvents = NewRelicEvent| NewRelicApiResponseEvent | NewRelicE
 export interface NewRelicPluginOptions extends PluginOptions {
   /**
    * Optional default values for one or more NewRelicContext
-   * vars 
+   * vars
    */
   defaultContext?: PluginContext;
 }

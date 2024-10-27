@@ -1,4 +1,4 @@
-import { BasePublisher, BaseEventModel } from '../../base';
+import { BaseEventModel, BasePublisher } from '../../base';
 import type { StratumSnapshot } from '../../types';
 import { isDefined } from '../../utils/general';
 
@@ -133,7 +133,9 @@ export class NewRelicPublisher extends BasePublisher {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   async publish(content: any, snapshot: StratumSnapshot) {
     const interaction = this.getDefaultInteraction(snapshot);
-    const isValid = isDefined(snapshot?.eventOptions?.data?.isValid) ? !!snapshot?.eventOptions?.data?.isValid : undefined;
+    const isValid = isDefined(snapshot?.eventOptions?.data?.isValid)
+      ? !!snapshot?.eventOptions?.data?.isValid
+      : undefined;
     interaction.setAttribute('isValid', isValid);
 
     /**

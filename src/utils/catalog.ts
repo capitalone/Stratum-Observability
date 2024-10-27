@@ -1,10 +1,10 @@
 import { BaseEventModel } from '../base';
 import type {
-  StratumCatalog,
   CatalogErrors,
-  CatalogMetadata,
+  CatalogEvent,
   CatalogKey,
-  CatalogItem,
+  CatalogMetadata,
+  StratumCatalog,
   UserDefinedCatalogOptions
 } from '../types';
 import { Injector } from './injector';
@@ -14,7 +14,7 @@ import { Injector } from './injector';
  * catalog items and metadata and performs validation to transform
  * catalog items into event models.
  */
-export class RegisteredStratumCatalog<T extends CatalogItem = CatalogItem> {
+export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent> {
   /**
    * Internal catalog id, generated from incoming options.
    */
@@ -111,7 +111,7 @@ export class RegisteredStratumCatalog<T extends CatalogItem = CatalogItem> {
         } else {
           if (model.isValid) {
             this.validModels[key] = model;
-            this.injector.registerCatalogItemId(this.id, model.id);
+            this.injector.registerEventId(this.id, model.id);
           } else {
             errors.push(...model.validationErrors);
           }

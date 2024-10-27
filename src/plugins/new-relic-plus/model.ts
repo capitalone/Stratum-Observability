@@ -8,9 +8,7 @@ import { NewRelicApiResponseEvent, NewRelicErrorEvent, NewRelicEvent } from './t
  * Extends BaseEventModel and adds additional properties
  * to send to New Relic.
  */
-export class NewRelicEventModel<
-  T extends NewRelicEvent<string> = NewRelicEvent
-> extends BaseEventModel<T> {
+export class NewRelicEventModel<T extends NewRelicEvent<string> = NewRelicEvent> extends BaseEventModel<T> {
   /**
    * Data object that has been processed by BaseEventModel to replace
    * dynamic placeholders.

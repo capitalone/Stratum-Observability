@@ -5,7 +5,7 @@ import type { AbTestSchema } from './ab-test';
  * Types that can be used to define the required
  * id property in catalog items.
  */
-export type CatalogItemId = number | string;
+export type EventId = number | string;
 
 /**
  * Union of types that can be used to reference items
@@ -17,7 +17,7 @@ export type CatalogKey = number | string;
  * Base definition of objects within a stratum catalog. All catalog
  * items should extend this interface.
  */
-export interface CatalogItem<EventType extends string = string> {
+export interface CatalogEvent<EventType extends string = string> {
   /**
    * Type of event this catalog item describes. The eventType determines the
    * contents used in publishing as well as the validation rules that
@@ -34,16 +34,16 @@ export interface CatalogItem<EventType extends string = string> {
   /**
    * Unique identifier for the item within the catalog
    */
-  id: CatalogItemId;
+  id: EventId;
 }
 
 /**
- * Collection of CatalogItems keyed by a CatalogKey.
+ * Collection of CatalogEvents keyed by a CatalogKey.
  *
  * For improved type hinting, explicitly define the catalog item
  * interfaces via the generic property.
  */
-export type StratumCatalog<T extends CatalogItem = CatalogItem<'base'>> = { [key in CatalogKey]: T };
+export type StratumCatalog<T extends CatalogEvent = CatalogEvent<'base'>> = { [key in CatalogKey]: T };
 
 /**
  * List of keys associated with invalid catalog items determined during
@@ -95,7 +95,7 @@ export interface CatalogMetadata {
  * User-definable stratum catalog options that can be specified by consuming apps.
  * All metadata is optional but the catalog itself is required.
  */
-export interface UserDefinedCatalogOptions<T extends CatalogItem = CatalogItem> extends Partial<CatalogMetadata> {
+export interface UserDefinedCatalogOptions<T extends CatalogEvent = CatalogEvent> extends Partial<CatalogMetadata> {
   /**
    * Collection of catalog items to import into stratum.
    */
@@ -106,7 +106,7 @@ export interface UserDefinedCatalogOptions<T extends CatalogItem = CatalogItem> 
  * The available catalog options that define the "default stratum catalog" on
  * initialization of the StratumService
  */
-export interface DefaultCatalogOptions<T extends CatalogItem = CatalogItem>
+export interface DefaultCatalogOptions<T extends CatalogEvent = CatalogEvent>
   extends Partial<Pick<CatalogMetadata, 'catalogVersion'>> {
   /**
    * Collection of catalog items to import into stratum.
@@ -119,7 +119,7 @@ export interface DefaultCatalogOptions<T extends CatalogItem = CatalogItem>
  * catalog metadata. All fields in a catalog are required, but the metadata can
  * has default values and does not necessarily have to be defined by the user
  */
-export type CatalogOptions<T extends CatalogItem = CatalogItem> = Required<UserDefinedCatalogOptions<T>>;
+export type CatalogOptions<T extends CatalogEvent = CatalogEvent> = Required<UserDefinedCatalogOptions<T>>;
 
 /**
  * Context-specific options that are used to dynamically alter catalog item data

@@ -16,7 +16,7 @@ export abstract class BasePlugin<T extends PluginContext, U extends PluginOption
    * for all plugins passed into the service instance.
    *
    * This value is used to specify custom dynamic data to
-   * pass to plugin publishers via CatalogItemOptions.pluginData.
+   * pass to plugin publishers via EventOptions.pluginData.
    */
   abstract name: string;
 
@@ -70,7 +70,7 @@ export abstract class BasePlugin<T extends PluginContext, U extends PluginOption
    * The global context is a collection of all
    * plugin context vars active on the stratum
    * service instance.
-   * 
+   *
    * Plugins may use this data to be context-aware even when a
    * specific plugin does not apply to the event being published.
    */
