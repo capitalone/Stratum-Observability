@@ -1,4 +1,4 @@
-import type { AbTestSchema, TagCatalogMetadata } from '../../src/types';
+import type { AbTestSchema, CatalogMetadata } from '../../src/types';
 
 export const STRATUM_LIBRARY_VERSION_PLACEHOLDER = '__stratumLibraryVersion__';
 
@@ -13,7 +13,7 @@ export const AB_TEST_SCHEMA: AbTestSchema = {
   testWeight: '0.5'
 };
 
-export const CATALOG_METADATA: TagCatalogMetadata = {
+export const CATALOG_METADATA: CatalogMetadata = {
   componentName: 'abc-component',
   componentVersion: 'component-version-2.3.4',
   catalogVersion: '7.8.9'

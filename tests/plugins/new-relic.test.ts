@@ -8,12 +8,12 @@ import {
   AB_TEST_SCHEMA,
   METADATA_CATALOG_ID
 } from '../utils/constants';
-import { NR_TAG_CATALOG, SAMPLE_A_CATALOG } from '../utils/catalog';
+import { NR_CATALOG, SAMPLE_A_CATALOG } from '../utils/catalog';
 import { NR_MOCK } from '../utils/fixtures';
 import { mockCrypto, mockNewRelic, mockSessionId, restoreStratumMocks } from '../utils/helpers';
 import { PLUGIN_A_NAME, PluginA, PluginAFactory } from '../utils/sample-plugin';
 
-describe('publishing tags via NewRelicPublisher', () => {
+describe('publishing events via NewRelicPublisher', () => {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const w = window as any;
   let stratum: StratumService;
@@ -36,7 +36,7 @@ describe('publishing tags via NewRelicPublisher', () => {
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION
     });
-    stratum.addCatalog({ tags: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
+    stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
     stratum.startAbTest(AB_TEST_SCHEMA);
   });
 
@@ -53,14 +53,14 @@ describe('publishing tags via NewRelicPublisher', () => {
     const setNameSpy = jest.spyOn(w.newrelic, 'setName');
 
     const result = await stratum.publishFromCatalog(METADATA_CATALOG_ID, 1, {
-      replacements: { PLACEHOLDER_2: 'testTag' }
+      replacements: { PLACEHOLDER_2: 'testEvent' }
     });
 
     expect(result).toBe(true);
     expect(setAttributeSpy).toHaveBeenCalledTimes(Object.keys(NR_MOCK.sampleA).length);
     expect(Object.fromEntries(setAttributeSpy.mock.calls)).toMatchObject(NR_MOCK.sampleA);
     expect(setNameSpy).toHaveBeenCalledTimes(1);
-    expect(setNameSpy).toHaveBeenCalledWith('testTag');
+    expect(setNameSpy).toHaveBeenCalledWith('testEvent');
     expect(saveSpy).toHaveBeenCalledTimes(1);
     expect(interactionSpy).toHaveBeenCalledTimes(2);
     expect(endSpy).toHaveBeenCalledTimes(2);
@@ -74,14 +74,14 @@ describe('publishing tags via NewRelicPublisher', () => {
     const setNameSpy = jest.spyOn(w.newrelic, 'setName');
 
     const result = await stratum.publishFromCatalog(METADATA_CATALOG_ID, 1, {
-      replacements: { PLACEHOLDER_2: 'testTag' }
+      replacements: { PLACEHOLDER_2: 'testEvent' }
     });
 
     expect(result).toBe(true);
     expect(setAttributeSpy).toHaveBeenCalledTimes(Object.keys(NR_MOCK.sampleA).length);
     expect(Object.fromEntries(setAttributeSpy.mock.calls)).toMatchObject(NR_MOCK.sampleA);
     expect(setNameSpy).toHaveBeenCalledTimes(1);
-    expect(setNameSpy).toHaveBeenCalledWith('testTag');
+    expect(setNameSpy).toHaveBeenCalledWith('testEvent');
     expect(saveSpy).toHaveBeenCalledTimes(1);
     expect(interactionSpy).toHaveBeenCalledTimes(2);
     expect(endSpy).toHaveBeenCalledTimes(2);
@@ -111,7 +111,7 @@ describe('publishing tags via NewRelicPublisher', () => {
     });
     const nrpPlugin = NewRelicPlusPluginFactory();
     stratum.addPlugin(nrpPlugin);
-    const id = stratum.addCatalog({ tags: NR_TAG_CATALOG, ...CATALOG_METADATA });
+    const id = stratum.addCatalog({ items: NR_CATALOG, ...CATALOG_METADATA });
     const result = await stratum.publishFromCatalog(id, 'nrApiValid');
 
     expect(result).toBe(true);

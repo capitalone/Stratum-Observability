@@ -1,13 +1,13 @@
-import { BasePublisherModel, StratumService } from '../../src';
+import { BasePublisher, StratumService } from '../../src';
 import {
-  NewRelicApiResponseTagModel,
-  NewRelicErrorTagModel,
-  NewRelicEventTagModel,
+  NewRelicApiResponseEventModel,
+  NewRelicErrorEventModel,
+  NewRelicEventModel,
   NewRelicPlusPlugin,
   NewRelicPlusPluginFactory
 } from '../../src/plugins/new-relic-plus';
 import { AB_TEST_SCHEMA, globalWindow, PRODUCT_NAME, PRODUCT_VERSION } from '../utils/constants';
-import { NR_TAG_CATALOG, SAMPLE_A_CATALOG } from '../utils/catalog';
+import { NR_CATALOG, SAMPLE_A_CATALOG } from '../utils/catalog';
 import { NR_MOCK } from '../utils/fixtures';
 import { getPublishers, mockNewRelic, mockSessionId, restoreStratumMocks } from '../utils/helpers';
 import { NewRelicPluginFactory, NewRelicPublisher } from '../../src/plugins/new-relic';
@@ -21,7 +21,7 @@ describe('NewRelicPlusPublisher', () => {
     mockSessionId();
     nrpPlugin = NewRelicPlusPluginFactory();
     stratum = new StratumService({
-      catalog: { tags: NR_TAG_CATALOG },
+      catalog: { items: NR_CATALOG },
       plugins: [nrpPlugin, NewRelicPluginFactory()],
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION
@@ -37,19 +37,19 @@ describe('NewRelicPlusPublisher', () => {
     expect(getPublishers(stratum)[0]).toBeInstanceOf(NewRelicPublisher);
   });
 
-  it('should set the acceptedTagModels of NewRelicPlusPublisher to NR-events only', () => {
+  it('should set the acceptedEventModels of NewRelicPlusPublisher to NR-events only', () => {
     const nrpPublisher = getPublishers(stratum)[0];
-    expect(nrpPublisher.acceptedTagModels).toEqual([
-      NewRelicApiResponseTagModel,
-      NewRelicErrorTagModel,
-      NewRelicEventTagModel
+    expect(nrpPublisher.acceptedEventModels).toEqual([
+      NewRelicApiResponseEventModel,
+      NewRelicErrorEventModel,
+      NewRelicEventModel
     ]);
   });
 
-  describe('custom tag data', () => {
+  describe('custom event types', () => {
     describe('base event type', () => {
       it('should process a valid catalog item', () => {
-        expect(stratum.defaultCatalog?.validTags.nrEventValid).toBeInstanceOf(NewRelicEventTagModel);
+        expect(stratum.defaultCatalog?.validModels.nrEventValid).toBeInstanceOf(NewRelicEventModel);
       });
 
       it('should process an invalid catalog item', () => {
@@ -60,7 +60,7 @@ describe('NewRelicPlusPublisher', () => {
 
     describe('api response event type', () => {
       it('should process a valid catalog item', () => {
-        expect(stratum.defaultCatalog?.validTags.nrApiValid).toBeInstanceOf(NewRelicApiResponseTagModel);
+        expect(stratum.defaultCatalog?.validModels.nrApiValid).toBeInstanceOf(NewRelicApiResponseEventModel);
       });
 
       it('should process an invalid catalog item', () => {
@@ -71,7 +71,7 @@ describe('NewRelicPlusPublisher', () => {
 
     describe('error event type', () => {
       it('should process a valid catalog item', () => {
-        expect(stratum.defaultCatalog?.validTags.nrErrorValid).toBeInstanceOf(NewRelicErrorTagModel);
+        expect(stratum.defaultCatalog?.validModels.nrErrorValid).toBeInstanceOf(NewRelicErrorEventModel);
       });
 
       it('should process an invalid catalog item', () => {
@@ -82,7 +82,7 @@ describe('NewRelicPlusPublisher', () => {
   });
 
   describe('publishing logic', () => {
-    let publisher: BasePublisherModel;
+    let publisher: BasePublisher;
     beforeEach(() => {
       publisher = stratum.publishers[0];
       mockNewRelic();
@@ -101,7 +101,7 @@ describe('NewRelicPlusPublisher', () => {
       const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
       const endSpy = jest.spyOn(globalWindow.newrelic, 'end');
 
-      const result = await stratum.publishTag('nrEventValid');
+      const result = await stratum.publish('nrEventValid');
 
       expect(result).toBe(true);
       expect(publisherSpy).toHaveBeenCalledTimes(1);
@@ -122,7 +122,7 @@ describe('NewRelicPlusPublisher', () => {
       const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
       const endSpy = jest.spyOn(globalWindow.newrelic, 'end');
 
-      const result = await stratum.publishTag('nrApiValid');
+      const result = await stratum.publish('nrApiValid');
 
       expect(result).toBe(true);
       expect(publisherSpy).toHaveBeenCalledTimes(1);
@@ -144,7 +144,7 @@ describe('NewRelicPlusPublisher', () => {
       const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
       const endSpy = jest.spyOn(globalWindow.newrelic, 'end');
 
-      const result = await stratum.publishTag('nrErrorValid');
+      const result = await stratum.publish('nrErrorValid');
 
       expect(result).toBe(true);
       expect(publisherSpy).toHaveBeenCalledTimes(1);
@@ -169,7 +169,7 @@ describe('NewRelicPlusPublisher', () => {
         }
       });
       stratum = new StratumService({
-        catalog: { tags: NR_TAG_CATALOG },
+        catalog: { items: NR_CATALOG },
         plugins: [nrpPlugin],
         productName: PRODUCT_NAME,
         productVersion: PRODUCT_VERSION
@@ -203,7 +203,7 @@ describe('NewRelicPlusPublisher', () => {
 
     it('should not publish undefined variables', async () => {
       const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
-      await stratum.publishTag('nrEventValid');
+      await stratum.publish('nrEventValid');
       const attributes = Object.fromEntries(setAttributeSpy.mock.calls);
       expect(Object.keys(attributes)).not.toContain('stratum_myCustomVar');
       expect(Object.keys(attributes)).toContain('stratum_myCustomVar2');
@@ -213,7 +213,7 @@ describe('NewRelicPlusPublisher', () => {
       const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
       nrpPlugin.setContext('myCustomVar', 'abc');
       nrpPlugin.setContext('myCustomVar2', false);
-      await stratum.publishTag('nrEventValid');
+      await stratum.publish('nrEventValid');
       const attributes = Object.fromEntries(setAttributeSpy.mock.calls);
       expect(attributes.stratum_myCustomVar).toBe('abc');
       expect(attributes.stratum_myCustomVar2).toBe(false);
@@ -224,7 +224,7 @@ describe('NewRelicPlusPublisher', () => {
       stratum.addPlugin(PluginAFactory());
       nrpPlugin.setContext('myCustomVar', 'test1');
       nrpPlugin.setContext('myCustomVar2', 'test2');
-      const id = stratum.addCatalog({ tags: SAMPLE_A_CATALOG, componentName: 'noop' });
+      const id = stratum.addCatalog({ items: SAMPLE_A_CATALOG, componentName: 'noop' });
       await stratum.publishFromCatalog(id, 1);
       const attributes = Object.fromEntries(setAttributeSpy.mock.calls);
       expect(attributes.stratum_myCustomVar).toBe('test1');

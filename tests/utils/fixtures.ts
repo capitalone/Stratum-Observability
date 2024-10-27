@@ -1,4 +1,4 @@
-import type { StratumEvent, UserDefinedTagOptions } from '../../src/types';
+import type { StratumSnapshot, UserDefinedEventOptions } from '../../src/types';
 import {
   AB_TEST_SCHEMA,
   PRODUCT_NAME,
@@ -11,7 +11,7 @@ import {
   METADATA_CATALOG_ID
 } from './constants';
 
-export const SAMPLE_TAG_OPTIONS: Partial<UserDefinedTagOptions> = {
+export const SAMPLE_EVENT_OPTIONS: Partial<UserDefinedEventOptions> = {
   replacements: {
     PLACEHOLDER_1: 'foo',
     PLACEHOLDER_2: 'bar'
@@ -32,7 +32,7 @@ export const NR_MOCK = {
     productVersion: PRODUCT_VERSION,
     stratumLibraryVersion: STRATUM_LIBRARY_VERSION_PLACEHOLDER,
     stratumSessionId: SESSION_ID,
-    tagId: '100'
+    stratumEventId: '100'
   },
   api: {
     abTests: [AB_TEST_SCHEMA],
@@ -52,7 +52,7 @@ export const NR_MOCK = {
     statusText: 'statusText',
     stratumLibraryVersion: STRATUM_LIBRARY_VERSION_PLACEHOLDER,
     stratumSessionId: SESSION_ID,
-    tagId: '102'
+    stratumEventId: '102'
   },
   error: {
     abTests: [AB_TEST_SCHEMA],
@@ -72,7 +72,7 @@ export const NR_MOCK = {
     reason: 'myreason',
     stratumLibraryVersion: STRATUM_LIBRARY_VERSION_PLACEHOLDER,
     stratumSessionId: SESSION_ID,
-    tagId: '104'
+    stratumEventId: '104'
   },
   sampleA: {
     abTests: [AB_TEST_SCHEMA],
@@ -90,11 +90,11 @@ export const NR_MOCK = {
     prop2: 'prop2',
     stratumLibraryVersion: STRATUM_LIBRARY_VERSION_PLACEHOLDER,
     stratumSessionId: SESSION_ID,
-    tagId: '1'
+    stratumEventId: '1'
   }
 };
 
-export const BASE_EVENT_MOCK: StratumEvent = {
+export const BASE_EVENT_MOCK: StratumSnapshot = {
   abTestSchemas: [],
   catalog: {
     id: DEFAULT_CATALOG_ID,
@@ -106,8 +106,8 @@ export const BASE_EVENT_MOCK: StratumEvent = {
   },
   data: {
     eventType: 'base',
-    tagDescription: 'base tag 1',
-    tagId: 1
+    description: 'base event 1',
+    id: 1
   },
   globalContext: {},
   plugins: {},
@@ -115,8 +115,7 @@ export const BASE_EVENT_MOCK: StratumEvent = {
   productVersion: PRODUCT_VERSION,
   stratumSessionId: SESSION_ID,
   stratumVersion: STRATUM_LIBRARY_VERSION_PLACEHOLDER,
-  tag: {
-    displayName: 'Tag Key "1" (Type: "base", ID: "1")',
+  event: {
     eventType: 'base',
     id: 1
   }

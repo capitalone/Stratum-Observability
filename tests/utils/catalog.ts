@@ -1,68 +1,68 @@
-import { NewRelicEventType, NewRelicTags } from '../../src/plugins/new-relic-plus';
-import { TagCatalog } from '../../src/types';
-import { ATagObject, BTagObject, SampleEventType } from './sample-plugin';
+import { NewRelicEventType, NewRelicEvents } from '../../src/plugins/new-relic-plus';
+import { StratumCatalog } from '../../src/types';
+import { AEvent, BEvent, SampleEventType } from './sample-plugin';
 
-export const SAMPLE_A_CATALOG: TagCatalog<ATagObject> = {
+export const SAMPLE_A_CATALOG: StratumCatalog<AEvent> = {
   1: {
     eventType: SampleEventType.A,
-    name: '${PLACEHOLDER_2}',
+    name: '{{PLACEHOLDER_2}}',
     prop1: 'prop1',
     prop2: 'prop2',
-    tagDescription: 'tag 1',
-    tagId: 1
+    description: 'event 1',
+    id: 1
   },
   2: {
     eventType: SampleEventType.A,
     name: 'name2',
     prop1: 'abc',
     prop2: '123',
-    tagDescription: 'tag 2',
-    tagId: 2
+    description: 'event 2',
+    id: 2
   },
   3: {
     eventType: SampleEventType.A,
     name: 'name3',
     prop1: 'xyz',
     prop2: '789',
-    tagDescription: 'tag 3',
-    tagId: 4
+    description: 'event 3',
+    id: 4
   },
   4: {
     eventType: SampleEventType.A,
     name: 'name4',
     prop1: 'mmm',
     prop2: 'nnn',
-    tagDescription: 'tag 4',
-    tagId: 8
+    description: 'event 4',
+    id: 8
   }
 };
 
-export const SAMPLE_A_CATALOG_2: TagCatalog<ATagObject> = {
+export const SAMPLE_A_CATALOG_2: StratumCatalog<AEvent> = {
   abc: {
     eventType: SampleEventType.A,
     name: 'abc',
     prop1: '1prop',
     prop2: '2prop',
-    tagDescription: 'tag 3',
-    tagId: 1000
+    description: 'event 3',
+    id: 1000
   }
 };
 
-export const SAMPLE_B_CATALOG: TagCatalog<BTagObject> = {
+export const SAMPLE_B_CATALOG: StratumCatalog<BEvent> = {
   1: {
     eventType: SampleEventType.B,
     prop3: true,
     prop4: 1,
-    tagDescription: 'tag 1',
-    tagId: 1
+    description: 'event 1',
+    id: 1
   },
   2: {
     eventType: SampleEventType.B,
     prop3: false,
     prop4: 0,
     prop5: 'prop5',
-    tagDescription: 'tag 2',
-    tagId: 1
+    description: 'event 2',
+    id: 1
   }
 };
 
@@ -70,8 +70,7 @@ export const INVALID_SAMPLE_CATALOG: any = {
   0: {},
   1: {
     eventType: SampleEventType.A,
-    prop1: 'prop1',
-    tagDescription: ''
+    prop1: 'prop1'
   },
   3: {
     eventType: SampleEventType.B
@@ -80,31 +79,31 @@ export const INVALID_SAMPLE_CATALOG: any = {
     eventType: SampleEventType.A,
     prop1: 'prop1',
     prop2: 'prop2',
-    tagDescription: 'tag 1',
-    tagId: 1
+    description: 'event 1',
+    id: 1
   },
   duplicate: {
     eventType: SampleEventType.A,
     prop1: 'prop1',
     prop2: 'prop2',
-    tagDescription: 'tag 1',
-    tagId: 1
+    description: 'event 1',
+    id: 1
   }
 };
 
-export const NR_TAG_CATALOG: TagCatalog<NewRelicTags> = {
+export const NR_CATALOG: StratumCatalog<NewRelicEvents> = {
   nrEventValid: {
     eventType: NewRelicEventType.EVENT,
     message: 'abc',
     name: 'nrevent',
-    tagDescription: 'description',
-    tagId: 100
+    description: 'description',
+    id: 100
   },
   nrEventInvalid: {
     eventType: NewRelicEventType.EVENT,
     name: '',
-    tagDescription: 'description',
-    tagId: 101
+    description: 'description',
+    id: 101
   },
   nrApiValid: {
     eventType: NewRelicEventType.API_RESPONSE,
@@ -115,16 +114,16 @@ export const NR_TAG_CATALOG: TagCatalog<NewRelicTags> = {
     requestUri: 'requestUri',
     statusCode: 'statusCode',
     statusText: 'statusText',
-    tagDescription: 'description',
-    tagId: 102
+    description: 'description',
+    id: 102
   },
   nrApiInvalid: {
     eventType: NewRelicEventType.API_RESPONSE,
     name: 'nrapiresponse',
     requestHeaders: '',
     statusText: '',
-    tagDescription: 'description',
-    tagId: 103
+    description: 'description',
+    id: 103
   } as any,
   nrErrorValid: {
     errorCode: 'myerrorcode',
@@ -135,26 +134,26 @@ export const NR_TAG_CATALOG: TagCatalog<NewRelicTags> = {
     message: 'errormessage',
     name: 'nrerror',
     reason: 'myreason',
-    tagDescription: 'description',
-    tagId: 104
+    description: 'description',
+    id: 104
   },
   nrErrorInvalid: {
     eventType: NewRelicEventType.ERROR,
     name: 'nrerror',
-    tagDescription: 'description',
-    tagId: 104
+    description: 'description',
+    id: 104
   } as any
 };
 
-export const BASE_TAG_CATALOG: TagCatalog = {
+export const BASE_CATALOG: StratumCatalog = {
   1: {
     eventType: 'base',
-    tagDescription: 'base tag 1',
-    tagId: 1
+    description: 'base event 1',
+    id: 1
   },
   2: {
     eventType: 'base',
-    tagDescription: 'base tag 2',
-    tagId: 2
+    description: 'base event 2',
+    id: 2
   }
 };

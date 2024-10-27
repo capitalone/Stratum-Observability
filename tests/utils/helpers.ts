@@ -1,4 +1,4 @@
-import { AUTO_LOGGING_KEY, DEBUG_KEY, STORED_SESSION_ID_KEY, StratumService, GLOBAL_LISTENER_KEY } from '../../src';
+import { DEBUG_KEY, STORED_SESSION_ID_KEY, StratumService, GLOBAL_LISTENER_KEY } from '../../src';
 import { webcrypto } from 'node:crypto';
 import { globalWindow, SESSION_ID } from './constants';
 
@@ -8,10 +8,6 @@ export function getPublishers(service: StratumService) {
 
 export function enableDebugMode(value: boolean) {
   sessionStorage.setItem(DEBUG_KEY, '' + value);
-}
-
-export function enableAutoLogging(value: boolean) {
-  sessionStorage.setItem(AUTO_LOGGING_KEY, '' + value);
 }
 
 export function isUuid(uuid: string) {

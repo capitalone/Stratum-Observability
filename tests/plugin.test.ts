@@ -1,5 +1,5 @@
 import { StratumService } from '../src';
-import type { StratumEvent } from '../src/types';
+import type { StratumSnapshot } from '../src/types';
 import { PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
 import { enableDebugMode, getPublishers, restoreStratumMocks } from './utils/helpers';
 import {
@@ -24,7 +24,7 @@ describe('stratum base plugin functionality', () => {
     enableDebugMode(true);
     pluginA = PluginAFactory();
     stratum = new StratumService({
-      catalog: { tags: SAMPLE_A_CATALOG },
+      catalog: { items: SAMPLE_A_CATALOG },
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION,
       plugins: [pluginA]
@@ -40,27 +40,27 @@ describe('stratum base plugin functionality', () => {
     it('should allow run time plugin registration and populate across the publishing flow', async () => {
       stratum.addPlugin(PluginBFactory({ pluginOptions }));
       const listener = jest.fn();
-      const event = await new Promise<StratumEvent>((resolve) => {
+      const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));
-        stratum.addEventListener(listener);
-        stratum.publishTag(1);
+        stratum.addSnapshotListener(listener);
+        stratum.publish(1);
       });
 
       expect(Object.keys(stratum.injector.plugins)).toStrictEqual([PLUGIN_A_NAME, PLUGIN_B_NAME]);
-      expect(Object.keys(stratum.injector.tagTypeModelMap).sort()).toStrictEqual(['a', 'b', 'base', 'empty']);
-      expect(stratum.injector.tagTypeModelMap.empty.pluginName).toEqual(PLUGIN_A_NAME);
+      expect(Object.keys(stratum.injector.eventTypeModelMap).sort()).toStrictEqual(['a', 'b', 'base', 'empty']);
+      expect(stratum.injector.eventTypeModelMap.empty.pluginName).toEqual(PLUGIN_A_NAME);
       expect(getPublishers(stratum)).toHaveLength(2);
       expect(listener).toHaveBeenCalledTimes(1);
       expect(Object.keys(event.plugins)).toStrictEqual([PLUGIN_A_NAME]);
     });
 
-    it('should allow plugin b publishers to intercept events from plugin a via acceptedTagModels', async () => {
-      stratum.addPlugin(PluginBFactory({ pluginOptions, acceptedTagModels: [AModel] }));
+    it('should allow plugin b publishers to intercept events from plugin a via acceptedEventModels', async () => {
+      stratum.addPlugin(PluginBFactory({ pluginOptions, acceptedEventModels: [AModel] }));
       const listener = jest.fn();
-      const event = await new Promise<StratumEvent>((resolve) => {
+      const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));
-        stratum.addEventListener(listener);
-        stratum.publishTag(1);
+        stratum.addSnapshotListener(listener);
+        stratum.publish(1);
       });
       expect(getPublishers(stratum)).toHaveLength(2);
       expect(Object.keys(event.plugins)).toStrictEqual([PLUGIN_A_NAME, PLUGIN_B_NAME]);
@@ -86,8 +86,8 @@ describe('stratum base plugin functionality', () => {
 
   describe('plugin publishing', () => {
     it('should restrict publishing to plugin-specific models by default', () => {
-      expect(pluginA.publishers[0].acceptedTagModels).toHaveLength(2);
-      expect(pluginA.publishers[0].acceptedTagModels).toStrictEqual([EmptyModel, AModel]);
+      expect(pluginA.publishers[0].acceptedEventModels).toHaveLength(2);
+      expect(pluginA.publishers[0].acceptedEventModels).toStrictEqual([EmptyModel, AModel]);
     });
   });
 
@@ -102,23 +102,23 @@ describe('stratum base plugin functionality', () => {
   });
 
   describe('atomic publishing', () => {
-    it('should preserve plugin vars at the time publishTag was called', async () => {
+    it('should preserve plugin vars at the time publish was called', async () => {
       const listener = jest.fn();
 
-      const event = await new Promise<StratumEvent>((resolve) => {
+      const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));
-        stratum.addEventListener(listener);
-        stratum.publishTag(1);
+        stratum.addSnapshotListener(listener);
+        stratum.publish(1);
         pluginA.setContext('var1', '123');
       });
 
       expect(listener).toHaveBeenCalledTimes(1);
       expect(event.plugins[PLUGIN_A_NAME].context.var1).toEqual('default');
 
-      const event2 = await new Promise<StratumEvent>((resolve) => {
+      const event2 = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));
-        stratum.addEventListener(listener);
-        stratum.publishTag(1);
+        stratum.addSnapshotListener(listener);
+        stratum.publish(1);
       });
       expect(event2.plugins[PLUGIN_A_NAME].context.var1).toEqual('123');
     });

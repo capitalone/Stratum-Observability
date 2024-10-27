@@ -1,11 +1,11 @@
 import {
   STORED_SESSION_ID_KEY,
-  addGlobalStratumEventListener,
-  RegisteredTagCatalog,
+  addGlobalStratumSnapshotListener,
+  RegisteredStratumCatalog,
   Logger,
   StratumService
 } from '../src';
-import * as utils from '../src/utils/types';
+import * as utils from '../src/utils/general';
 import { enableDebugMode, getPublishers, mockCrypto, restoreStratumMocks } from './utils/helpers';
 import {
   AB_TEST_SCHEMA,
@@ -28,7 +28,7 @@ describe('stratum service base functionality', () => {
   beforeEach(() => {
     mockCrypto();
     stratum = new StratumService({
-      catalog: { tags: SAMPLE_A_CATALOG },
+      catalog: { items: SAMPLE_A_CATALOG },
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION,
       plugins: [PluginAFactory()]
@@ -60,20 +60,20 @@ describe('stratum service base functionality', () => {
       productVersion: PRODUCT_VERSION
     });
     expect(getPublishers(stratum)).toEqual([]);
-    expect(Object.keys(stratum.injector.tagTypeModelMap)).toHaveLength(1);
-    expect(stratum.injector.tagTypeModelMap.base).toBeDefined();
+    expect(Object.keys(stratum.injector.eventTypeModelMap)).toHaveLength(1);
+    expect(stratum.injector.eventTypeModelMap.base).toBeDefined();
     expect(Object.keys(stratum.catalogs)).toHaveLength(0);
     expect(stratum.defaultCatalog).toBeUndefined();
     expect(Object.keys(stratum.injector.plugins)).toHaveLength(0);
   });
 
-  it('should create the expected models for a dynamically loaded TagCatalog', () => {
+  it('should create the expected models for a dynamically loaded StratumCatalog', () => {
     const stratum = new StratumService({
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION,
       plugins: [PluginAFactory()]
     });
-    const id = stratum.addCatalog({ tags: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
+    const id = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
     const catalog = Object.values(stratum.catalogs)[0];
     expect(id).toEqual(METADATA_CATALOG_ID);
     expect(stratum.defaultCatalog).toBeUndefined();
@@ -82,43 +82,43 @@ describe('stratum service base functionality', () => {
     expect(catalog.metadata).toStrictEqual(CATALOG_METADATA);
 
     expect(Object.keys(catalog.errors)).toHaveLength(0);
-    expect(Object.keys(catalog?.validTags)).toHaveLength(catalog1Length);
+    expect(Object.keys(catalog?.validModels)).toHaveLength(catalog1Length);
 
-    expect(catalog.validTags[1]).toBeInstanceOf(AModel);
-    expect(catalog.validTags[2]).toBeInstanceOf(AModel);
-    expect(catalog.validTags[3]).toBeInstanceOf(AModel);
-    expect(catalog.validTags[4]).toBeInstanceOf(AModel);
+    expect(catalog.validModels[1]).toBeInstanceOf(AModel);
+    expect(catalog.validModels[2]).toBeInstanceOf(AModel);
+    expect(catalog.validModels[3]).toBeInstanceOf(AModel);
+    expect(catalog.validModels[4]).toBeInstanceOf(AModel);
 
-    expect(Object.keys(stratum.injector.registeredTagIds)).toHaveLength(1);
-    const tagIdObject = Object.values(SAMPLE_A_CATALOG).reduce((obj, x) => Object.assign(obj, { [x.tagId]: true }), {});
-    expect(stratum.injector.registeredTagIds[METADATA_CATALOG_ID]).toEqual(tagIdObject);
+    expect(Object.keys(stratum.injector.registeredEventIds)).toHaveLength(1);
+    const idObject = Object.values(SAMPLE_A_CATALOG).reduce((obj, x) => Object.assign(obj, { [x.id]: true }), {});
+    expect(stratum.injector.registeredEventIds[METADATA_CATALOG_ID]).toEqual(idObject);
   });
 
-  it('should create the expected models for a default TagCatalog', () => {
-    const catalog = stratum.defaultCatalog as RegisteredTagCatalog;
+  it('should create the expected models for a default StratumCatalog', () => {
+    const catalog = stratum.defaultCatalog as RegisteredStratumCatalog;
     expect(catalog).toBeDefined();
     expect(catalog.isValid).toBe(true);
     expect(catalog.id).toBe(DEFAULT_CATALOG_ID);
     expect(catalog.metadata).toStrictEqual(GENERATED_DEFAULT_METADATA);
 
     expect(Object.keys(catalog.errors)).toHaveLength(0);
-    expect(Object.keys(catalog?.validTags)).toHaveLength(catalog1Length);
+    expect(Object.keys(catalog?.validModels)).toHaveLength(catalog1Length);
 
-    expect(Object.keys(stratum.injector.registeredTagIds)).toHaveLength(1);
-    const tagIdObject = Object.values(SAMPLE_A_CATALOG).reduce((obj, x) => Object.assign(obj, { [x.tagId]: true }), {});
-    expect(stratum.injector.registeredTagIds[DEFAULT_CATALOG_ID]).toEqual(tagIdObject);
+    expect(Object.keys(stratum.injector.registeredEventIds)).toHaveLength(1);
+    const idObject = Object.values(SAMPLE_A_CATALOG).reduce((obj, x) => Object.assign(obj, { [x.id]: true }), {});
+    expect(stratum.injector.registeredEventIds[DEFAULT_CATALOG_ID]).toEqual(idObject);
   });
 
-  it('should infer the properties of a default TagCatalog without metadata', () => {
+  it('should infer the properties of a default StratumCatalog without metadata', () => {
     stratum = new StratumService({
-      catalog: { tags: SAMPLE_A_CATALOG },
+      catalog: { items: SAMPLE_A_CATALOG },
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION,
       plugins: [PluginAFactory()]
     });
 
     const id = `${PRODUCT_NAME}:${PRODUCT_VERSION}`;
-    const catalog = stratum.defaultCatalog as RegisteredTagCatalog;
+    const catalog = stratum.defaultCatalog as RegisteredStratumCatalog;
     expect(stratum.defaultCatalog).toBeDefined();
     expect(catalog.isValid).toBe(true);
     expect(catalog.id).toBe(id);
@@ -129,15 +129,15 @@ describe('stratum service base functionality', () => {
     });
   });
 
-  it('should allow partial definition of TagCatalog metadata on initialization', () => {
+  it('should allow partial definition of StratumCatalog metadata on initialization', () => {
     stratum = new StratumService({
-      catalog: { tags: SAMPLE_A_CATALOG },
+      catalog: { items: SAMPLE_A_CATALOG },
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION,
       plugins: [PluginAFactory()]
     });
     const id = `${PRODUCT_NAME}:${PRODUCT_VERSION}`;
-    const catalog = stratum.defaultCatalog as RegisteredTagCatalog;
+    const catalog = stratum.defaultCatalog as RegisteredStratumCatalog;
     expect(stratum.defaultCatalog).toBeDefined();
     expect(catalog.isValid).toBe(true);
     expect(catalog.id).toEqual(id);
@@ -149,18 +149,18 @@ describe('stratum service base functionality', () => {
   });
 
   it('should prevent multiple catalogs with the same id to be instantiated', () => {
-    // Add standard tag catalog
-    stratum.addCatalog({ tags: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
+    // Add a standard catalog
+    stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
     expect(Object.keys(stratum.catalogs)).toHaveLength(2);
 
     // Attempt to add another catalog with the same metadata
-    const id = stratum.addCatalog({ tags: {}, ...CATALOG_METADATA });
+    const id = stratum.addCatalog({ items: {}, ...CATALOG_METADATA });
     expect(id).toBe('');
     expect(Object.keys(stratum.catalogs)).toHaveLength(2);
 
     // Update the metadata
     const result2 = stratum.addCatalog({
-      tags: {},
+      items: {},
       ...CATALOG_METADATA,
       catalogVersion: 'different'
     });
@@ -170,41 +170,41 @@ describe('stratum service base functionality', () => {
 
   it('should handle removing catalogs at run-time', () => {
     stratum = new StratumService({
-      catalog: { tags: SAMPLE_A_CATALOG, catalogVersion: CATALOG_METADATA.catalogVersion },
+      catalog: { items: SAMPLE_A_CATALOG, catalogVersion: CATALOG_METADATA.catalogVersion },
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION,
       plugins: [PluginAFactory()]
     });
 
-    const id = stratum.addCatalog({ tags: SAMPLE_A_CATALOG_2, ...CATALOG_METADATA }) as string;
+    const id = stratum.addCatalog({ items: SAMPLE_A_CATALOG_2, ...CATALOG_METADATA }) as string;
     const defaultId = stratum.defaultCatalog?.id as string;
 
     expect(id).toBe(METADATA_CATALOG_ID);
     expect(defaultId).toBe(DEFAULT_CATALOG_ID_W_CATALOG_VERSION);
     expect(Object.keys(stratum.catalogs)).toHaveLength(2);
     expect(stratum.defaultCatalog).toBeDefined();
-    expect(Object.keys(stratum.injector.registeredTagIds)).toHaveLength(2);
-    expect(stratum.injector.registeredTagIds[defaultId]).toBeDefined();
-    expect(stratum.injector.registeredTagIds[id]).toBeDefined();
+    expect(Object.keys(stratum.injector.registeredEventIds)).toHaveLength(2);
+    expect(stratum.injector.registeredEventIds[defaultId]).toBeDefined();
+    expect(stratum.injector.registeredEventIds[id]).toBeDefined();
 
     stratum.removeCatalog(defaultId);
 
     expect(Object.keys(stratum.catalogs)).toHaveLength(1);
-    expect(Object.keys(stratum.injector.registeredTagIds)).toHaveLength(1);
+    expect(Object.keys(stratum.injector.registeredEventIds)).toHaveLength(1);
     expect(stratum.defaultCatalog).toBeUndefined();
-    expect(stratum.injector.registeredTagIds[defaultId]).toBeUndefined();
+    expect(stratum.injector.registeredEventIds[defaultId]).toBeUndefined();
 
     stratum.removeCatalog(id);
 
     expect(Object.keys(stratum.catalogs)).toHaveLength(0);
-    expect(Object.keys(stratum.injector.registeredTagIds)).toHaveLength(0);
+    expect(Object.keys(stratum.injector.registeredEventIds)).toHaveLength(0);
   });
 
   describe('publish unhappy paths', () => {
-    it('should fail to publish tag if a default catalog is not found', async () => {
+    it('should fail to publish an event if a default catalog is not found', async () => {
       const warnSpy = jest.spyOn(Logger.prototype, 'debug');
       stratum = new StratumService({ productName: PRODUCT_NAME, productVersion: PRODUCT_VERSION });
-      const result = await stratum.publishTag('foo');
+      const result = await stratum.publish('foo');
       expect(result).toBe(false);
       expect(warnSpy).toHaveBeenCalledTimes(1);
     });
@@ -216,9 +216,9 @@ describe('stratum service base functionality', () => {
       expect(warnSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('should warn if tag key to publish in catalog cannot be found', async () => {
+    it('should warn if the key to publish in catalog cannot be found', async () => {
       const warnSpy = jest.spyOn(Logger.prototype, 'debug');
-      const result = await stratum.publishFromCatalog(DEFAULT_CATALOG_ID, 'unknowntagkey');
+      const result = await stratum.publishFromCatalog(DEFAULT_CATALOG_ID, 'unknownkey');
       expect(result).toBe(false);
       expect(warnSpy).toHaveBeenCalledTimes(1);
     });
@@ -250,24 +250,6 @@ describe('stratum service base functionality', () => {
     });
   });
 
-  it('should handle removing a specific publisher by id', () => {
-    expect(getPublishers(stratum)).toHaveLength(1);
-    stratum.removePublisher(1);
-    expect(getPublishers(stratum)).toHaveLength(0);
-  });
-
-  it('should handle removing a specific publisher by object', () => {
-    expect(getPublishers(stratum)).toHaveLength(1);
-    stratum.removePublisher(stratum.publishers[0]);
-    expect(getPublishers(stratum)).toHaveLength(0);
-  });
-
-  it('should warn if unable to remove a publisher', () => {
-    const spy = jest.spyOn(Logger.prototype, 'debug');
-    stratum.removePublisher(999);
-    expect(spy).toHaveBeenCalledTimes(1);
-  });
-
   describe('stratum session id', () => {
     it('should generate a valid UUID (non NIL) by default', () => {
       const regExp = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -291,19 +273,19 @@ describe('stratum service base functionality', () => {
 
   describe(`globalThis events`, () => {
     it('should not attempt to load event listeners if debug mode is not enabled', () => {
-      expect(stratum.injector.getExternalEventListeners()).toEqual([]);
+      expect(stratum.injector.getExternalSnapshotListeners()).toEqual([]);
     });
 
     it('should fail to add event listener if an error occurs', () => {
       jest.spyOn(utils, 'isDefined').mockImplementation(() => {
         throw new Error();
       });
-      expect(stratum.addEventListener(() => {})).toBe(false);
+      expect(stratum.addSnapshotListener(() => {})).toBe(false);
     });
 
     it('should add event listener to the global object', () => {
       const mock = jest.fn();
-      expect(stratum.addEventListener(mock)).toBe(true);
+      expect(stratum.addSnapshotListener(mock)).toBe(true);
       expect(globalWindow[`stratum_config_${PRODUCT_NAME}`].listeners[0]).toStrictEqual(mock);
     });
 
@@ -312,10 +294,10 @@ describe('stratum service base functionality', () => {
       const mockFn2 = jest.fn();
 
       enableDebugMode(true);
-      stratum.addEventListener(mockFn1);
-      addGlobalStratumEventListener(mockFn2);
+      stratum.addSnapshotListener(mockFn1);
+      addGlobalStratumSnapshotListener(mockFn2);
 
-      expect(stratum.injector.getExternalEventListeners()).toStrictEqual([mockFn2, mockFn1]);
+      expect(stratum.injector.getExternalSnapshotListeners()).toStrictEqual([mockFn2, mockFn1]);
     });
   });
 });

@@ -1,7 +1,7 @@
-import { StratumEvent, StratumService } from '../src';
+import { StratumSnapshot, StratumService } from '../src';
 import { PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
 import { enableDebugMode, mockSessionId, restoreStratumMocks } from './utils/helpers';
-import { BASE_TAG_CATALOG } from './utils/catalog';
+import { BASE_CATALOG } from './utils/catalog';
 import { BASE_EVENT_MOCK } from './utils/fixtures';
 
 describe('load stratum without plugins', () => {
@@ -21,30 +21,30 @@ describe('load stratum without plugins', () => {
     jest.restoreAllMocks();
   });
 
-  describe('add base tag model objects', () => {
-    it('should allow adding catalogs containing base tag objects', async () => {
-      const id = stratum.addCatalog({ tags: BASE_TAG_CATALOG });
+  describe('add base events', () => {
+    it('should allow adding catalogs containing base events', async () => {
+      const id = stratum.addCatalog({ items: BASE_CATALOG });
       expect(id).toBeDefined();
       const catalog = stratum.catalogs[id];
       expect(catalog).toBeDefined();
       expect(catalog.isValid).toBe(true);
-      expect(Object.keys(catalog.validTags)).toStrictEqual(['1', '2']);
+      expect(Object.keys(catalog.validModels)).toStrictEqual(['1', '2']);
     });
   });
 
-  describe('allow publishing basic tags', () => {
+  describe('allow publishing base events', () => {
     let id = '';
 
     beforeEach(() => {
-      id = stratum.addCatalog({ tags: BASE_TAG_CATALOG });
+      id = stratum.addCatalog({ items: BASE_CATALOG });
     });
 
-    it('should allow publishing tags', async () => {
+    it('should allow publishing  events', async () => {
       const listener = jest.fn();
 
-      const event = await new Promise<StratumEvent>((resolve) => {
+      const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));
-        stratum.addEventListener(listener);
+        stratum.addSnapshotListener(listener);
         stratum.publishFromCatalog(id, 1);
       });
 

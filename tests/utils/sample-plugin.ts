@@ -1,5 +1,5 @@
-import { BasePlugin, BasePublisherModel, BaseTagModel } from '../../src';
-import type { PluginFactory, PluginFactoryWithRequiredOptions, StratumEvent, TagObject } from '../../src/types';
+import { BasePlugin, BasePublisher, BaseEventModel } from '../../src';
+import type { PluginFactory, PluginFactoryWithRequiredOptions, StratumSnapshot, CatalogEvent } from '../../src/types';
 
 /**
  * Constants & types
@@ -29,16 +29,16 @@ export interface PluginBOptions {
 
 export interface PluginBFactoryOptions {
   pluginOptions: PluginBOptions;
-  acceptedTagModels?: BasePublisherModel['acceptedTagModels'];
+  acceptedEventModels?: BasePublisher['acceptedEventModels'];
 }
 
-export interface ATagObject extends TagObject<SampleEventType.A> {
+export interface AEvent extends CatalogEvent<SampleEventType.A> {
   prop1: string;
   prop2: string;
   name: string;
 }
 
-export interface BTagObject extends TagObject<SampleEventType.B> {
+export interface BEvent extends CatalogEvent<SampleEventType.B> {
   prop3: boolean;
   prop4: number;
   prop5?: string;
@@ -48,9 +48,9 @@ export interface BTagObject extends TagObject<SampleEventType.B> {
  * Models
  */
 
-export class EmptyModel extends BaseTagModel {}
-export class AModel extends BaseTagModel<ATagObject> {}
-export class BModel extends BaseTagModel<BTagObject> {}
+export class EmptyModel extends BaseEventModel {}
+export class AModel extends BaseEventModel<AEvent> {}
+export class BModel extends BaseEventModel<BEvent> {}
 
 /**
  * Publishers
@@ -58,14 +58,14 @@ export class BModel extends BaseTagModel<BTagObject> {}
 
 export const samplePublisherSdk = jest.fn();
 
-export class SamplePublisher extends BasePublisherModel {
+export class SamplePublisher extends BasePublisher {
   name: string;
 
-  constructor(name: string, acceptedTagModels?: BasePublisherModel['acceptedTagModels']) {
+  constructor(name: string, acceptedEventModels?: BasePublisher['acceptedEventModels']) {
     super();
     this.name = name;
-    if (acceptedTagModels) {
-      this.acceptedTagModels = acceptedTagModels;
+    if (acceptedEventModels) {
+      this.acceptedEventModels = acceptedEventModels;
     }
   }
 
@@ -73,11 +73,11 @@ export class SamplePublisher extends BasePublisherModel {
     return true;
   }
 
-  getTagOutput(_tag: BaseTagModel) {
+  getEventOutput(_model: BaseEventModel) {
     return this.name;
   }
 
-  async publish(content: any, event: StratumEvent) {
+  async publish(content: any, event: StratumSnapshot) {
     samplePublisherSdk(event, content);
   }
 }
@@ -126,4 +126,4 @@ export const PluginAFactory: PluginFactory<PluginA, PluginAOptions> = (options) 
 
 export const PluginBFactory: PluginFactoryWithRequiredOptions<PluginB, PluginBFactoryOptions> = (
   options: PluginBFactoryOptions
-) => new PluginB(options.pluginOptions, new SamplePublisher('publisher-b', options.acceptedTagModels));
+) => new PluginB(options.pluginOptions, new SamplePublisher('publisher-b', options.acceptedEventModels));

@@ -1,20 +1,19 @@
 import {
-  RegisteredTagCatalog,
+  RegisteredStratumCatalog,
   generateCatalogId,
   Injector,
   Logger,
   STORED_SESSION_ID_KEY,
   GLOBAL_LISTENER_KEY,
-  addGlobalStratumEventListener,
-  addStratumEventListener,
+  addGlobalStratumSnapshotListener,
+  addStratumSnapshotListener,
   debugModeEnabled,
   generateDefaultSessionId,
-  uuid,
-  autoLoggingEnabled
+  uuid
 } from '../src';
 import { INVALID_SAMPLE_CATALOG, SAMPLE_A_CATALOG } from './utils/catalog';
 import { CATALOG_METADATA, globalWindow, PRODUCT_NAME, PRODUCT_VERSION, SESSION_ID } from './utils/constants';
-import { enableAutoLogging, enableDebugMode, isUuid, mockCrypto, restoreStratumMocks } from './utils/helpers';
+import { enableDebugMode, isUuid, mockCrypto, restoreStratumMocks } from './utils/helpers';
 import { PluginAFactory } from './utils/sample-plugin';
 
 describe('util functions', () => {
@@ -31,7 +30,7 @@ describe('util functions', () => {
     describe('generateCatalogId()', () => {
       it('should use the componentName and catalogVersion if provided', () => {
         const options = {
-          tags: {},
+          items: {},
           catalogVersion: CATALOG_METADATA.catalogVersion,
           componentName: CATALOG_METADATA.componentName,
           componentVersion: CATALOG_METADATA.componentVersion
@@ -42,7 +41,7 @@ describe('util functions', () => {
 
       it('should use the productName if componentName is not provided', () => {
         const options = {
-          tags: {},
+          items: {},
           catalogVersion: CATALOG_METADATA.catalogVersion,
           componentVersion: CATALOG_METADATA.componentVersion
         };
@@ -52,7 +51,7 @@ describe('util functions', () => {
 
       it('should use the componentVersion if catalogVersion is not provided', () => {
         const options = {
-          tags: {},
+          items: {},
           componentName: CATALOG_METADATA.componentName,
           componentVersion: CATALOG_METADATA.componentVersion
         };
@@ -62,14 +61,14 @@ describe('util functions', () => {
 
       it('should use the productVersion if componentVersion is not provided', () => {
         const options = {
-          tags: {}
+          items: {}
         };
         const expected = `${PRODUCT_NAME}:${PRODUCT_VERSION}`;
         expect(generateCatalogId(options, PRODUCT_NAME, PRODUCT_VERSION)).toEqual(expected);
       });
     });
 
-    describe('RegisteredTagCatalog', () => {
+    describe('RegisteredStratumCatalog', () => {
       const id = 'catalog-id';
       let injector: Injector;
 
@@ -78,18 +77,18 @@ describe('util functions', () => {
         injector.registerPlugin(PluginAFactory());
       });
 
-      it('should handle validating a tag catalog on construction', () => {
-        const options = { tags: SAMPLE_A_CATALOG, ...CATALOG_METADATA };
-        const catalog = new RegisteredTagCatalog(id, options, injector);
+      it('should handle validating a stratum catalog on construction', () => {
+        const options = { items: SAMPLE_A_CATALOG, ...CATALOG_METADATA };
+        const catalog = new RegisteredStratumCatalog(id, options, injector);
         expect(catalog.id).toEqual(id);
         expect(catalog.isValid).toBe(true);
       });
 
-      it('should show validation errors for invalid tags', () => {
-        const options = { tags: INVALID_SAMPLE_CATALOG, ...CATALOG_METADATA };
-        const catalog = new RegisteredTagCatalog(id, options, injector);
+      it('should show validation errors for invalid events', () => {
+        const options = { items: INVALID_SAMPLE_CATALOG, ...CATALOG_METADATA };
+        const catalog = new RegisteredStratumCatalog(id, options, injector);
         expect(catalog.isValid).toBe(false);
-        expect(Object.keys(catalog.validTags)).toHaveLength(1);
+        expect(Object.keys(catalog.validModels)).toHaveLength(1);
         expect(Object.keys(catalog.errors)).toHaveLength(4);
         expect(catalog.errors[0].errors).toHaveLength(1);
         expect(catalog.errors[1].errors).toHaveLength(2);
@@ -109,29 +108,29 @@ describe('util functions', () => {
         jest.restoreAllMocks();
       });
 
-      it('should add event listener to global object', () => {
+      it('should add event listener to globalThis', () => {
         const mock = jest.fn();
-        expect(addStratumEventListener(PRODUCT_NAME, mock)).toBe(true);
+        expect(addStratumSnapshotListener(PRODUCT_NAME, mock)).toBe(true);
         expect(globalWindow[configKey].listeners[0]).toStrictEqual(mock);
       });
 
-      it('should read in all valid event listeners', () => {
+      it('should read in all valid snapshot listeners', () => {
         const mockFn1 = jest.fn();
         const mockFn2 = jest.fn();
 
-        const result1 = addStratumEventListener(PRODUCT_NAME, mockFn1);
-        const result2 = addStratumEventListener(PRODUCT_NAME, mockFn2);
+        const result1 = addStratumSnapshotListener(PRODUCT_NAME, mockFn1);
+        const result2 = addStratumSnapshotListener(PRODUCT_NAME, mockFn2);
         expect(result1).toBe(true);
         expect(result2).toBe(true);
         expect(globalWindow[configKey].listeners).toStrictEqual([mockFn1, mockFn2]);
       });
 
-      it('should add global event listeners', () => {
+      it('should add global snapshot listeners', () => {
         const mockFn1 = jest.fn();
         const mockFn2 = jest.fn();
 
-        const result1 = addGlobalStratumEventListener(mockFn1);
-        const result2 = addGlobalStratumEventListener(mockFn2);
+        const result1 = addGlobalStratumSnapshotListener(mockFn1);
+        const result2 = addGlobalStratumSnapshotListener(mockFn2);
         expect(result1).toBe(true);
         expect(result2).toBe(true);
         expect(globalWindow[GLOBAL_LISTENER_KEY].listeners).toStrictEqual([mockFn1, mockFn2]);
@@ -163,21 +162,6 @@ describe('util functions', () => {
     });
 
     describe('Logger', () => {
-      it('should execute console.autoLog only if debugModeEnabled', () => {
-        const logger = new Logger();
-        const loggerSpy = jest.spyOn(console, 'log').mockImplementation();
-        const str = 'teststring';
-
-        logger.autoLog(str);
-        expect(loggerSpy).toHaveBeenCalledTimes(0);
-
-        enableAutoLogging(true);
-
-        logger.autoLog(str);
-        expect(loggerSpy).toHaveBeenCalledTimes(1);
-        expect(loggerSpy).toHaveBeenCalledWith('[Stratum]', str);
-      });
-
       it('should execute console.debug only if debugModeEnabled', () => {
         const logger = new Logger();
         const loggerSpy = jest.spyOn(console, 'debug').mockImplementation();
@@ -206,21 +190,6 @@ describe('util functions', () => {
           throw new Error();
         });
         expect(debugModeEnabled()).toEqual(false);
-      });
-    });
-
-    describe('autoLoggingEnabled()', () => {
-      it('should return true if debug mode flag is found in session storage', () => {
-        expect(autoLoggingEnabled()).toBe(false);
-        enableAutoLogging(true);
-        expect(autoLoggingEnabled()).toBe(true);
-      });
-
-      it('should return false if session storage is unavailable', () => {
-        jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-          throw new Error();
-        });
-        expect(autoLoggingEnabled()).toEqual(false);
       });
     });
 
