@@ -1,32 +1,17 @@
-🚨🚨 **IMPORTANT: For new features and bugfixes, please do not create a Pull Request without creating an issue first.** 🚨🚨  
-*Failure to do so may result in the rejection of the PR.*
-
-#### 🔖 Linked issue (required)  
-Fixes #[ISSUE NUMBER]  
-
-----
-
-#### 👷 Testing plan (required)
-*Outline replicatable steps to test your PR's changes. Provide any supporting output/screenshots here, as applicable.*
-
------
+📣 **For new features and bugfixes, please create an issue first**  
 
 #### ✔️ Checklist
 
-Please review our [Contributor Docs](https://github.com/capitalone/Stratum-Observability/blob/main/CONTRIBUTING.md) for more details.
+Please review our [Contributor Docs](https://github.com/capitalone/Stratum-Observability/blob/main/CONTRIBUTING.md) for more details
 
-Select one of the following:
-* [ ] I have not updated the package version (Stratum library code is unchanged and a new version in npm is not needed).
-* [ ] I have bumped the Stratum library version in `package.json` and `package-lock.json` in preparation for a new release.
-
-*Indicate which of the following pre-release actions you've done.*  
+* [ ] Fixes #REPLACE_WITH_ISSUE_NUMBER
+* [ ] I have run `npm version` (considering (semantic versioning)[https://semver.org/#summary)) for a new release if needed
 * [ ] If the package version changed, this PR's title is prefixed with `release([VERSION]): `
-* [ ] I have added or updated the typedoc-style comments to all touched classes, functions, types, and constants.
-* [ ] If this PR adds/updates functionality, I have updated the unit tests accordingly. All new functionality is covered.
+* [ ] I have added [typedoc-style comments](https://typedoc.org/example/) to my changes to improve the developer experience
 
 ----
 
 **⏩ Next steps:**
-- Please ensure that all the automated pipeline steps pass.
-- Once your PR is opened, CODEOWNERS will be requested as reviewers. At least one review from a CODEOWNER is required to merge your PR.
-- Once approved, a CODEOWNER will merge your changes and perform any other necessary release tasks.
+- Please ensure that all the automated pipeline steps pass
+- Once your PR is opened, CODEOWNERS will be requested as reviewers. At least one review from a CODEOWNER is required to merge your PR
+- Once approved, a CODEOWNER will merge your changes and perform any other necessary release tasks
