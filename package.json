@@ -1,6 +1,6 @@
 {
   "name": "@capitalone/stratum-observability",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Library for defining and publishing observability events through plugin-based architecture",
   "license": "Apache-2.0",
   "repository": {
