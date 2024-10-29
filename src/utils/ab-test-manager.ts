@@ -92,7 +92,7 @@ export class AbTestManager {
   /**
    * Function to generate SchemaObjects for each AbTest instance in the AbTestManager.
    * Additionally, can optionally add transient one-time AbTest(Schema)s to generate as well.
-   * This option is typically used when processing TagOptions on tag publish.
+   * This option is typically used when processing EventOptions on publish.
    *
    * @param {AbTestSchema | AbTest | (AbTestSchema | AbTest)[]} [transient] - One-time AbTest instances or schemas to generate schemas for
    */

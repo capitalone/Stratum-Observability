@@ -5,7 +5,7 @@ import { NewRelicPublisher } from './publisher';
 /**
  * New Relic plugin
  *
- * Use this plugin to send existing Tag Catalog events to New Relic.
+ * Use this plugin to send existing Stratum Catalog events to New Relic.
  * This enables near real-time dashboards and alerting.
  */
 export class NewRelicPlugin extends BasePlugin<never, never> {

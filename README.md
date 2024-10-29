@@ -12,7 +12,7 @@ to your observability stack. We also offer community-driven plugins for popular 
 ## Getting started
 
 A typical Stratum implementation consists of:
-1. Tag Catalog - single source of truth for the voice of your application
+1. Stratum Catalog - single source of truth for the voice of your application
 1. Shared StratumService instance to load plugins and publish events from
 1. Functional code aka your application code! Any files containing logic you'd like to observe
 
@@ -21,10 +21,10 @@ A typical Stratum implementation consists of:
   import { NewRelicPluginFactory } from '@capitalone/stratum-observability/plugins/new-relic';
 
   /**
-   * Tag Keys afford the best chance of consistent references throughout your application. 
+   * Using enumerated keys afford the best chance of consistent references throughout your application. 
    * This replaces the need to hard code string values as reference.
    */
-  export const TagKey = {
+  export const EventKey = {
     LOADED: 'app-loaded'
   };
 
@@ -49,26 +49,26 @@ A typical Stratum implementation consists of:
     productName: 'stratumExampleApp',
 
     /**
-     * Typically, this is your release tag or the version of the application you're 
-     * getting observability from
+     * Typically, this references the version of the application you're 
+     * publishing observability events from
      */
     productVersion: 'REPLACE_WITH_PRODUCT_VERSION',
 
     /**
-     * Your "Tag Catalog" or dictionary serving as the source-of-truth of events 
+     * Your "catalog" or dictionary serves as the source-of-truth of events 
      * published by an application. This provides the structure for standardization.
      * 
-     * Custom plugins allow you to define your own tag catalog events, attributes,
+     * Custom plugins allow you to define your own catalog events, attributes,
      * and custom validation rules.
      * 
-     * We've added an inline tag for the sake of getting started.
+     * We've added an example event for the sake of getting started.
      */
     catalog: {
-      tags: {
-        [TagKey.LOADED]: {
+      items: {
+        [EventKey.LOADED]: {
           eventType: 'base', // The base event type for Stratum events
-          tagDescription: 'This application has loaded for the first time',
-          tagId: 1 // Very important reference identifier -- the key to simple queries
+          description: 'This application has loaded for the first time',
+          id: 1 // Very important reference identifier -- the key to simple queries
         }
       }
     }
@@ -80,7 +80,7 @@ A typical Stratum implementation consists of:
    * 
    * (see: https://docs.newrelic.com/docs/browser/browser-monitoring/getting-started/introduction-browser-monitoring/)
    */
-  stratumService.publishTag(TagKey.LOADED);
+  stratumService.publish(EventKey.LOADED);
 ```
 
 ## Installation
@@ -101,7 +101,7 @@ yarn add @capitalone/stratum-observability
 
 Plugins are composed of 3 pieces of data:
 1. Name as a string identifier (required)
-2. Map of tag eventTypes to the correspond TagModel class (optional)
+2. Map of eventTypes to the correspond EventModel class (optional)
 3. One or more instantiated publishers to handle specific event type(s) (optional)
 
 ```javascript
@@ -113,8 +113,8 @@ import { BasePlugin } from '@capitalone/stratum-observability';
 export class SimplePlugin extends BasePlugin<never, never> {
   name: 'mySimplePlugin',
   eventTypes: {
-    // Map tag catalog items with { eventType: 'simple' } to an instance of SimpleTagModel
-    simple: SimpleTagModel
+    // Map catalog events with { eventType: 'simple' } to an instance of SimpleEventModel
+    simple: SimpleEventModel
   },
   publishers: [ new SimplePublisher() ]
 }
@@ -152,57 +152,58 @@ const myPluginInstance = SimplePluginFactoryWithOptions(); // Valid
 const myPluginInstanceWithOptions = SimplePluginFactoryWithOptions({ isLoggedIn: true }); // Also valid
 ```
 
-### Tag catalog entries
-Through plugins, you may define custom event type which are referenced by the `eventType` property on your tags. Any tag loaded into your StratumService must have a corresponding eventType to TagModel relation defined via imported plugin.
+### Catalog entries
+Through plugins, you may define custom event type which are referenced by the `eventType` property on your catalog items. Any events loaded into your StratumService must have a corresponding eventType to EventModel relation defined via a plugin.
 
 ```javascript
-import { TagCatalog, TagObject } from '@capitalone/stratum-observability';
+import { StratumCatalog, CatalogEvent } from '@capitalone/stratum-observability';
 
 const SimpleEventType = 'my-simple-event';
 
 /**
- * Creates a new event type with the base tag object fields
+ * Creates a new event type with the base stratum event fields
  * and an additional "simpleValue" number attribute
  */
-interface SimpleTagObject extends TagObject<SimpleEventType> {
+interface SimpleEvent extends StratumEvent<SimpleEventType> {
   simpleValue: number;
 }
 
 /**
- * A tag catalog composed of SimpleTagObjects can then
+ * A catalog composed of SimpleEvents can then
  * be defined.
  * 
- * If you do not provide your custom TagObject as a generic to the TagCatalog type, 
- * type-hinting for required properties will not be available. 
+ * If you do not provide your custom event type interface as a generic
+ * to the StratumCatalog type, ype-hinting for required properties
+ * will not be available. 
  * 
- * Multiple custom TagObjects can be added as a union:
- * `TagCatalog<MyCustomObject1 | MyCustomObject2>`
+ * Multiple custom event type interfaces can be added as a union:
+ * `StratumCatalog<SimpleEvent | ComplexEvent>`
  */
-const catalog = TagCatalog<SimpleTagObject> = {
+const catalog: StratumCatalog<SimpleEvent> = {
   {
     eventType: SimpleEventType,
 
-    // Implement the required TagObject properties
-    tagDescription: 'My simple event that fires from the "mySimplePlugin" plugin',
-    tagId: 1,
+    // Implement the required base properties required by Stratum
+    description: 'My simple event that fires from the "mySimplePlugin" plugin',
+    id: 1,
 
-    // Additional fields defined by SimpleTagObject
+    // Additional fields defined by SimpleEvent
     simpleValue: 12345
   }
 }
 ```
 
-### Tag models
+### Event models
 ```javascript
-import { BaseTagModel } from '@capitalone/stratum-observability';
+import { BaseEventModel } from '@capitalone/stratum-observability';
 
-// Pass your TagObject interface into the parent TagModel
-export class SimpleTagModel extends BaseTagModel<SimpleTagObject> {
-  // Override to include custom tag validation rules
+// Pass your SimpleEvent interface into the base EventModel
+export class SimpleEventModel extends BaseEventModel<SimpleEvent> {
+  // Override to include any custom run-time validation rules
   protected checkValidity(): boolean {
     let isValid = super.checkValidity();
 
-    if(!this.tag.simpleValue || typeof this.tag.simpleValue === 'number') {
+    if(!this.item.simpleValue || typeof this.item.simpleValue === 'number') {
       this.addValidationError('The "simpleValue" value provided is in an invalid format');
       isValid = false;
     }
@@ -214,14 +215,14 @@ export class SimpleTagModel extends BaseTagModel<SimpleTagObject> {
 
 ### Publisher models
 ```javascript
-import { BasePublisherModel, TagOptions } from '@capitalone/stratum-observability';
+import { BasePublisher, EventOptions } from '@capitalone/stratum-observability';
 
-interface SimpleEvent {
-  tagId: number,
+interface ExternalEventSchema {
+  id: number,
   simpleValue: number
 }
 
-export class SimplePublisher extends BasePublisherModel<SimpleEvent> {
+export class SimplePublisher extends BasePublisher<ExternalEventSchema> {
   // Required
   name = 'SimplePublisher';
 
@@ -232,19 +233,19 @@ export class SimplePublisher extends BasePublisherModel<SimpleEvent> {
    * 
    * In this case, we make sure that console.log() is accessible.
    */
-  async isAvailable(_tag: SimpleTagModel) {
+  async isAvailable(_model: SimpleEventModel) {
     return typeof console !== 'undefined';
   }
 
   /**
    * Required
-   * Map the contents of your tag model instance to your event schema
+   * Map the contents of your event model instance to your event schema
    */
-  getTagOutput(tag: SimpleTagModel, options?: Partial<TagOptions>): SimpleEvent {
-    const tagData = tag.getData(options);
+  getModelOutput(model: SimpleEventModel, options?: Partial<EventOptions>): ExternalEventSchema {
+    const data = model.getData(options);
     return {
-      tagId: tagData.tagId,
-      simpleValue: tagData.simpleValue
+      id: data.id,
+      simpleValue: data.simpleValue
     };
   }
 
@@ -254,8 +255,8 @@ export class SimplePublisher extends BasePublisherModel<SimpleEvent> {
    * 
    * In this, case we publish the event to the console log
    */
-  async publish(event: SimpleEvent) {
-    console.log('publishing simple event!', { tagId: event.tagId, simpleValue: event.simpleValue });
+  async publish(event: ExternalEventSchema) {
+    console.log('publishing simple event!', { id: event.id, simpleValue: event.simpleValue });
   }
 }
 ```

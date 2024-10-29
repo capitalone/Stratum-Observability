@@ -126,7 +126,7 @@ export class NewRelicPublisher extends BasePublisher {
   }
 
   /**
-   * Given a set of tag data, begin the interaction tracking, set
+   * Given a set of event data, begin the interaction tracking, set
    * related attributes and save BrowserInteraction event to
    * New Relic based off the default New Relic event.
    */
