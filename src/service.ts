@@ -26,8 +26,9 @@ import { Injector } from './utils/injector';
  *   4. Exposes functions for application to publish from catalogs and register plugins
  *
  * This class is designed to operate in a singleton-scope. However, this is dependent on use case.
- * We recommend that applications use a single reference to the same StratumService instance
- * across their codebase to avoid syncing data across service instances.
+ * We recommend that applications use a single reference to the same
+ * StratumService instance across their codebase to avoid syncing data across
+ * service instances.
  *
  * Different instances of the StratumService are independent from one another which is useful
  * for testing and implementation.
