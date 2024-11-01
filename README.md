@@ -1,6 +1,6 @@
 # Stratum Observability | standardization as you publish
 
-A no-dependency library defining a framework for sending analytics and observability events in a standardized format.
+A no-dependency library for sending analytics and observability events in a standardized format.
 Stratum is a plugin-based framework that allows you to create your own custom plugins to define, validate, and publish events
 to your observability stack. We also offer community-driven plugins for popular integrations.
 
