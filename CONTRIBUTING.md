@@ -37,13 +37,17 @@ Once we've looked over the issue, we'll label your PR as one of the following:
 
 ## Local development
 
-### 1. Install dependencies
+### 1. Fork the Repository
+
+Start by forking the [@capitalone/Stratum-Observability repository](https://github.com/capitalone/Stratum-Observability/), and cloning that forked repository onto your local machine.
+
+### 2. Install dependencies
 
 ```
 nvm use && npm ci
 ```
 
-### 2. Build
+### 3. Build
 This command will build out the compiled code within the repository's `dist/` folder.
 
 ```
@@ -71,7 +75,7 @@ For continuous building on changes, use the `build:watch` script instead.
 npm run build:watch
 ```
 
-### 3. Code quality & maintenance
+### 4. Code quality & maintenance
 #### lint
 Run code quality checks and attempt to fix any violations. This script is automatically run as part of a pre-commit hook. You will not likely need to run this manually.
 
@@ -86,7 +90,7 @@ Update code to conform to repository code style rules. This script is automatica
 npm run prettier
 ```
 
-### 4. Unit tests
+### 5. Unit tests
 Unit tests are run via Jest.
 
 #### test
@@ -103,7 +107,7 @@ npm run test:coverage
 
 ## Pull requests
 
-Once you are ready to merge your changes, open PR(s) in the repository and fill out the provided template.
+Once you are ready to merge your changes, open a pull request (PR) from your forked repository to the main project repository. Complete the provided template to help reviewers understand your changes.
 
 The template will prompt you for the following information:
 * A link to the connected Stratum intake request GitHub issue (include the "Fixes" prefix so that your issue will auto-close on PR merge)
