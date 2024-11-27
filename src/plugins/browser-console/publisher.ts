@@ -19,9 +19,11 @@ export class BrowserConsolePublisher extends BasePublisher {
    * Required
    * Returns data from underlying events to utilize
    * in the publish step.
+   *
+   * In this case, we send the stringified event data to be logged in the console.
    */
-  getEventOutput(_event: BaseEventModel, snapshot: StratumSnapshot) {
-    return snapshot.data;
+  getEventOutput(_event: BaseEventModel, snapshot: StratumSnapshot): string {
+    return JSON.stringify(snapshot.event);
   }
 
   /**
@@ -31,7 +33,7 @@ export class BrowserConsolePublisher extends BasePublisher {
    *
    * In this case, we make sure that console.log() is accessible.
    */
-  async isAvailable() {
+  async isAvailable(): Promise<boolean> {
     return typeof console !== 'undefined';
   }
 
@@ -39,10 +41,10 @@ export class BrowserConsolePublisher extends BasePublisher {
    * Required
    * Send your content to the external publisher
    *
-   * In this, case we publish the snapshot data to the console log
+   * In this, case we publish the stringified event data to the console.
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  async publish(_content: any, snapshot: StratumSnapshot) {
-    console.log(snapshot.data);
+  async publish(content: string): Promise<void> {
+    console.log(`BrowserConsolePlugin: ${content}`);
   }
 }

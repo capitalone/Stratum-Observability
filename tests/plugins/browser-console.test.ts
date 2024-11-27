@@ -45,17 +45,22 @@ describe('browser console plugin', () => {
     const consoleSpy = jest.spyOn(console, 'log');
 
     let result = await stratum.publish(1);
+    let expectedContent = `{"eventType":"${BASE_CATALOG[1].eventType}","id":${BASE_CATALOG[1].id}}`;
+    let expectedLoggedMessage = `BrowserConsolePlugin: ${expectedContent}`;
 
     expect(result).toBe(true);
-    expect(publishSpy).toHaveBeenCalledTimes(1);
-    expect(consoleSpy).toHaveBeenCalledWith(BASE_CATALOG[1]);
+    expect(publishSpy).toHaveBeenCalledWith(expectedContent, expect.anything());
+    expect(consoleSpy).toHaveBeenCalledWith(expectedLoggedMessage);
 
+    expectedContent = `{"eventType":"${BASE_CATALOG[2].eventType}","id":${BASE_CATALOG[2].id}}`;
+    expectedLoggedMessage = `BrowserConsolePlugin: ${expectedContent}`;
     result = await stratum.publish(2);
 
     expect(result).toBe(true);
-    expect(publishSpy).toHaveBeenCalledTimes(2);
-    expect(consoleSpy).toHaveBeenCalledWith(BASE_CATALOG[2]);
+    expect(publishSpy).toHaveBeenCalledWith(expectedContent, expect.anything());
+    expect(consoleSpy).toHaveBeenCalledWith(expectedLoggedMessage);
 
+    expect(publishSpy).toHaveBeenCalledTimes(2);
     expect(consoleSpy).toHaveBeenCalledTimes(2);
   });
 });

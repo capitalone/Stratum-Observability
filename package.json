@@ -27,6 +27,11 @@
       "types": "./dist/types/plugins/new-relic-plus/index.d.ts",
       "import": "./dist/esm/plugins/new-relic-plus/index.js",
       "default": "./dist/cjs/plugins/new-relic-plus/index.js"
+    },
+    "./plugins/browser-console": {
+      "types": "./dist/types/plugins/browser-console/index.d.ts",
+      "import": "./dist/esm/plugins/browser-console/index.js",
+      "default": "./dist/cjs/plugins/browser-console/index.js"
     }
   },
   "scripts": {
@@ -78,6 +83,9 @@
       ],
       "plugins/new-relic-plus": [
         "./dist/types/plugins/new-relic-plus/index.d.ts"
+      ],
+      "plugins/browser-console": [
+        "./dist/types/plugins/browser-console/index.d.ts"
       ]
     }
   }
