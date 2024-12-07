@@ -40,7 +40,6 @@
     "build:clean": "rimraf dist",
     "build:lib": "rollup -c --bundleConfigAsCjs",
     "build:watch": "npm run build:clean && npm run build:lib -- --watch",
-    "ci:install": "npm ci && npm run website:install",
     "lint": "eslint --config ./.eslintrc.js --max-warnings 0 'src/**/*.{js,ts}' --fix",
     "lint:check": "eslint --config ./.eslintrc.js --max-warnings 0 'src/**/*.{js,ts}'",
     "pre-commit": "lint-staged",
