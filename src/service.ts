@@ -9,7 +9,7 @@ import type {
   UserDefinedCatalogOptions,
   UserDefinedEventOptions
 } from './types';
-import { cloneStratumSnapshot, generateStratumSnapshot, populateDynamicEventOptions } from './utils';
+import { cloneStratumSnapshot, generateStratumSnapshot, populateDynamicEventOptions, GlobalPlugins, GlobalHooks } from './utils';
 import { generateCatalogId, RegisteredStratumCatalog } from './utils/catalog';
 import { addStratumSnapshotListener } from './utils/env';
 import { normalizeToArray } from './utils/general';
@@ -72,6 +72,11 @@ export class StratumService {
    */
   constructor(options: StratumServiceOptions) {
     this.injector = new Injector(options.productName, options.productVersion);
+
+    // register global plugins first if any exists
+    if (GlobalPlugins.plugins) {
+      this.addPlugin(GlobalPlugins.plugins);
+    } // if
 
     if (options.plugins) {
       this.addPlugin(options.plugins);
@@ -238,7 +243,11 @@ export class StratumService {
               internalSnapshot.eventOptions = populateDynamicEventOptions(publisher, options);
               const isAvailable = await publisher.isAvailable(model, internalSnapshot);
               if (isAvailable) {
-                const content = publisher.getEventOutput(model, internalSnapshot);
+                let content = publisher.getEventOutput(model, internalSnapshot);
+
+                // trigger onBeforePublish hooks - mutates content
+                content = GlobalHooks.triggerOnBeforePublish(content, model, internalSnapshot);
+
                 await publisher.publish(content, internalSnapshot);
                 resolve();
               } else {
