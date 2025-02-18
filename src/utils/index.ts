@@ -5,4 +5,3 @@ export * from './event';
 export * from './general';
 export * from './injector';
 export * from './global-plugins';
-export * from './global-hooks';
