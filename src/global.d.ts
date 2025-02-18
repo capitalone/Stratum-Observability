@@ -1,3 +1,3 @@
-interface Window {
-  stratum: any
+declare module globalThis {
+  var stratum: any;
 }

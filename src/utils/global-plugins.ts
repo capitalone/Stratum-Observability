@@ -8,7 +8,7 @@ export class GlobalPlugins {
    * Retrieve the list of plugins from the global namespace
    */
   static get plugins() {
-    return window?.stratum?.globalPlugins;
+    return globalThis?.stratum?.globalPlugins;
   }
 
   /**
@@ -18,16 +18,16 @@ export class GlobalPlugins {
    */
   static addPlugin(plugin: GenericPlugin): GenericPlugin[] {
     // initialize stratum namespace if not exist
-    if (!window.stratum) {
-      window.stratum = {};
+    if (!globalThis.stratum) {
+      globalThis.stratum = {};
     } // if
 
     // initialize stratum globalPlugins if not exists
-    if (!window.stratum.globalPlugins) {
-      window.stratum.globalPlugins = [];
+    if (!globalThis.stratum.globalPlugins) {
+      globalThis.stratum.globalPlugins = [];
     } // if
 
-    window.stratum.globalPlugins.push(plugin);
+    globalThis.stratum.globalPlugins.push(plugin);
 
     return GlobalPlugins.plugins;
   }
@@ -38,11 +38,11 @@ export class GlobalPlugins {
    * @returns - GenericPlugin[] - Returns the full list of global plutins after removal.
    */
   static removePlugin(pluginName: string) {
-    if (pluginName && window.stratum?.globalPlugins?.length > 0) {
-      const idx = window.stratum.globalPlugins.findIndex((plugin: GenericPlugin) => plugin.name === pluginName);
+    if (pluginName && globalThis.stratum?.globalPlugins?.length > 0) {
+      const idx = globalThis.stratum.globalPlugins.findIndex((plugin: GenericPlugin) => plugin.name === pluginName);
 
       if (idx > -1) {
-        window.stratum.globalPlugins.splice(idx, 1);
+        globalThis.stratum.globalPlugins.splice(idx, 1);
       } // if
     } // if
 

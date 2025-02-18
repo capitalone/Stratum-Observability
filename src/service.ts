@@ -243,11 +243,7 @@ export class StratumService {
               internalSnapshot.eventOptions = populateDynamicEventOptions(publisher, options);
               const isAvailable = await publisher.isAvailable(model, internalSnapshot);
               if (isAvailable) {
-                let content = publisher.getEventOutput(model, internalSnapshot);
-
-                // trigger onBeforePublish hooks - mutates content
-                content = GlobalHooks.triggerOnBeforePublishHooks(content, model, internalSnapshot);
-
+                const content = publisher.getEventOutput(model, internalSnapshot);
                 await publisher.publish(content, internalSnapshot);
                 resolve();
               } else {
