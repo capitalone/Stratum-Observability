@@ -246,7 +246,7 @@ export class StratumService {
                 let content = publisher.getEventOutput(model, internalSnapshot);
 
                 // trigger onBeforePublish hooks - mutates content
-                content = GlobalHooks.triggerOnBeforePublish(content, model, internalSnapshot);
+                content = GlobalHooks.triggerOnBeforePublishHooks(content, model, internalSnapshot);
 
                 await publisher.publish(content, internalSnapshot);
                 resolve();

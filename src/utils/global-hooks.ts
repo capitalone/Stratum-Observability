@@ -1,14 +1,20 @@
 import { BaseEventModel } from '../base';
 import { StratumSnapshot } from '../types';
 
+/**
+ * OnBeforePublish hook function prototype
+ */
 type onBeforePublishHook = (content: any, model: BaseEventModel, snapshot: StratumSnapshot) => any;
 
+/**
+ * Static utitliy to handle global hooks functionality.
+ */
 export class GlobalHooks {
   /**
    * Returns the registered hooks for onBeforePublish
    */
   static get onBeforePublishHooks() {
-    return window.stratum.globalHooks.onBeforePublishHooks;
+    return window.stratum?.globalHooks?.onBeforePublish || [];
   }
 
   /**
@@ -25,8 +31,8 @@ export class GlobalHooks {
       window.stratum.globalHooks = {};
     } // if
 
-    if (!window.stratum.globalHooks.onBeforePublishHooks) {
-      window.stratum.globalHooks.onBeforePublishHooks = [];
+    if (!window.stratum.globalHooks.onBeforePublish) {
+      window.stratum.globalHooks.onBeforePublish = [];
     } // if
   }
 
@@ -40,12 +46,34 @@ export class GlobalHooks {
     window.stratum.globalHooks.onBeforePublishHooks.push(hook);
   }
 
-  static triggerOnBeforePublish(content: any, model: BaseEventModel, snapshot: StratumSnapshot): any {
-    if (GlobalHooks.onBeforePublishHooks?.length > 0) {
-      // TODO: iterate through all hooks and transform content
+  /**
+   * Trigger all onBeforePublish hooks
+   * @param content - current content after mapping
+   * @param model - Tag model
+   * @param snapshot - Event snapshot
+   * @returns - Returns the tag content
+   */
+  static triggerOnBeforePublishHooks(content: any, model: BaseEventModel, snapshot: StratumSnapshot): any {
+    const hooks = GlobalHooks.onBeforePublishHooks;
 
+    // no hooks
+    if (hooks.length === 0) {
+      return content;
     } // if
-    
-    return content;
+
+    // iterate through all hooks and transform content
+    return hooks.reduce((contentAggregate: any, hook: onBeforePublishHook) => {
+      let curConent;
+
+      // try to apply hook
+      try {
+        curConent = hook(contentAggregate, model, snapshot);
+      } catch (e) { } // try-catch
+      
+      return {
+        ...contentAggregate,
+        ...curConent
+      };
+    }, { ...content });
   }
 }
