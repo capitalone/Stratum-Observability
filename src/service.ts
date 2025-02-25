@@ -73,14 +73,14 @@ export class StratumService {
   constructor(options: StratumServiceOptions) {
     this.injector = new Injector(options.productName, options.productVersion);
 
+    if (options.plugins) {
+      this.addPlugin(options.plugins);
+    }
+
     // register global plugins first if any exists
     if (GlobalPlugins.plugins) {
       this.addPlugin(GlobalPlugins.plugins);
     } // if
-
-    if (options.plugins) {
-      this.addPlugin(options.plugins);
-    }
 
     // Register the default catalog
     if (options.catalog) {
