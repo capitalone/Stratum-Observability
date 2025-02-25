@@ -9,12 +9,20 @@ import {
   addStratumSnapshotListener,
   debugModeEnabled,
   generateDefaultSessionId,
-  uuid
+  uuid,
+  getGlobalPlugins,
+  addGlobalPlugin,
+  removeGlobalPlugin
 } from '../src';
+import { BrowserConsolePlugin } from '../src/plugins/browser-console';
+import { NewRelicPlusPlugin } from '../src/plugins/new-relic-plus';
 import { INVALID_SAMPLE_CATALOG, SAMPLE_A_CATALOG } from './utils/catalog';
 import { CATALOG_METADATA, globalWindow, PRODUCT_NAME, PRODUCT_VERSION, SESSION_ID } from './utils/constants';
 import { enableDebugMode, isUuid, mockCrypto, restoreStratumMocks } from './utils/helpers';
 import { PluginAFactory } from './utils/sample-plugin';
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+const g = globalThis as any;
 
 describe('util functions', () => {
   beforeEach(() => {
@@ -207,6 +215,64 @@ describe('util functions', () => {
         delete (globalThis as any).crypto;
         expect(uuid()).toEqual('00000000-0000-0000-0000-000000000000');
       });
+    });
+  });
+
+  describe('global-plugins', () => {
+    it('should get global plugins', async () => {
+      // Arrange.
+      const plugin1 = new BrowserConsolePlugin();
+      const plugin2 = new NewRelicPlusPlugin();
+      g[GLOBAL_LISTENER_KEY] = {
+        globalPlugins: [plugin1, plugin2]
+      };
+
+      // Act.
+      const globalPlugins = getGlobalPlugins();
+
+      // Assert.
+      expect(globalPlugins).toEqual([plugin1, plugin2]);
+    });
+
+    it('should add a plugin to the global namespace', async () => {
+      // Arrange.
+      g[GLOBAL_LISTENER_KEY] = {};
+
+      // Act.
+      const plugin = new BrowserConsolePlugin();
+      addGlobalPlugin(plugin);
+
+      // Assert.
+      expect(g[GLOBAL_LISTENER_KEY].globalPlugins).toEqual([plugin]);
+    });
+
+    it('should remove a plugin from the global namespace', async () => {
+      // Arrange.
+      const plugin1 = new BrowserConsolePlugin();
+      const plugin2 = new NewRelicPlusPlugin();
+      g[GLOBAL_LISTENER_KEY] = {
+        globalPlugins: [plugin1, plugin2]
+      };
+      // Act.
+      removeGlobalPlugin('browserConsole');
+
+      // Assert.
+      expect(g[GLOBAL_LISTENER_KEY].globalPlugins).toEqual([plugin2]);
+    });
+
+    it('should not remove a plugin that does not exist', async () => {
+      // Arrange.
+      const plugin1 = new BrowserConsolePlugin();
+      const plugin2 = new NewRelicPlusPlugin();
+      g[GLOBAL_LISTENER_KEY] = {
+        globalPlugins: [plugin1, plugin2]
+      };
+
+      // Act.
+      removeGlobalPlugin('plugin3');
+
+      // Assert.
+      expect(g[GLOBAL_LISTENER_KEY].globalPlugins).toEqual([plugin1, plugin2]);
     });
   });
 });

@@ -3,9 +3,11 @@ import {
   addGlobalStratumSnapshotListener,
   RegisteredStratumCatalog,
   Logger,
-  StratumService
+  StratumService,
+  addGlobalPlugin
 } from '../src';
 import * as utils from '../src/utils/general';
+import { BrowserConsolePlugin, BrowserConsolePublisher } from '../src/plugins/browser-console';
 import { enableDebugMode, getPublishers, mockCrypto, restoreStratumMocks } from './utils/helpers';
 import {
   AB_TEST_SCHEMA,
@@ -19,7 +21,7 @@ import {
   globalWindow
 } from './utils/constants';
 import { SAMPLE_A_CATALOG, SAMPLE_A_CATALOG_2 } from './utils/catalog';
-import { AModel, PluginAFactory } from './utils/sample-plugin';
+import { AModel, PluginAFactory, SamplePublisher } from './utils/sample-plugin';
 
 describe('stratum service base functionality', () => {
   let stratum: StratumService;
@@ -146,6 +148,22 @@ describe('stratum service base functionality', () => {
       componentVersion: PRODUCT_VERSION,
       catalogVersion: ''
     });
+  });
+
+  it('should register global plugins if available', () => {
+    const consolePlugin = new BrowserConsolePlugin();
+    addGlobalPlugin(consolePlugin);
+    const localPlugins = PluginAFactory();
+    stratum = new StratumService({
+      catalog: { items: SAMPLE_A_CATALOG },
+      productName: PRODUCT_NAME,
+      productVersion: PRODUCT_VERSION,
+      plugins: [localPlugins]
+    });
+
+    expect(stratum.publishers.length).toEqual(2);
+    expect(stratum.publishers[0]).toBeInstanceOf(SamplePublisher);
+    expect(stratum.publishers[1]).toBeInstanceOf(BrowserConsolePublisher);
   });
 
   it('should prevent multiple catalogs with the same id to be instantiated', () => {

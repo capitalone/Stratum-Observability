@@ -9,7 +9,7 @@ import type {
   UserDefinedCatalogOptions,
   UserDefinedEventOptions
 } from './types';
-import { cloneStratumSnapshot, generateStratumSnapshot, populateDynamicEventOptions, GlobalPlugins } from './utils';
+import { cloneStratumSnapshot, generateStratumSnapshot, getGlobalPlugins, populateDynamicEventOptions } from './utils';
 import { generateCatalogId, RegisteredStratumCatalog } from './utils/catalog';
 import { addStratumSnapshotListener } from './utils/env';
 import { normalizeToArray } from './utils/general';
@@ -78,8 +78,9 @@ export class StratumService {
     }
 
     // register global plugins first if any exists
-    if (GlobalPlugins.plugins) {
-      this.addPlugin(GlobalPlugins.plugins);
+    const globalPlugins = getGlobalPlugins();
+    if (globalPlugins) {
+      this.addPlugin(globalPlugins);
     } // if
 
     // Register the default catalog

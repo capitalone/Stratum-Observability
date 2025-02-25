@@ -1,13 +1,13 @@
-import { GenericPlugin } from '../types';
 import { GLOBAL_LISTENER_KEY } from '../constants';
+import { GenericPlugin } from '../types';
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const g = globalThis as any;
-    
+
 /**
  * Retrieve the list of plugins from the global namespace
  */
-export function getGlobalPlugins() {
+export function getGlobalPlugins(): GenericPlugin[] | undefined {
   return g?.[GLOBAL_LISTENER_KEY]?.globalPlugins;
 }
 
@@ -16,7 +16,7 @@ export function getGlobalPlugins() {
  * @param plugin - GenericPlugin - Plugin to add
  * @returns - GenericPlugin[] - Returns the full list of global plugins after adding.
  */
-export function addPlugin(plugin: GenericPlugin): GenericPlugin[] {
+export function addGlobalPlugin(plugin: GenericPlugin): GenericPlugin[] | undefined {
   // initialize stratum namespace if not exist
   if (!g[GLOBAL_LISTENER_KEY]) {
     g[GLOBAL_LISTENER_KEY] = {};
@@ -37,7 +37,7 @@ export function addPlugin(plugin: GenericPlugin): GenericPlugin[] {
  * @param pluginName - string - Name of plugin to remove from global plugins list.
  * @returns - GenericPlugin[] - Returns the full list of global plutins after removal.
  */
-export function removePlugin(pluginName: string) {
+export function removeGlobalPlugin(pluginName: string) {
   if (pluginName && g[GLOBAL_LISTENER_KEY]?.globalPlugins?.length > 0) {
     const idx = g[GLOBAL_LISTENER_KEY].globalPlugins.findIndex((plugin: GenericPlugin) => plugin.name === pluginName);
 
