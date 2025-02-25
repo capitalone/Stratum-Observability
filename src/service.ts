@@ -9,7 +9,7 @@ import type {
   UserDefinedCatalogOptions,
   UserDefinedEventOptions
 } from './types';
-import { cloneStratumSnapshot, generateStratumSnapshot, populateDynamicEventOptions, GlobalPlugins, GlobalHooks } from './utils';
+import { cloneStratumSnapshot, generateStratumSnapshot, populateDynamicEventOptions, GlobalPlugins } from './utils';
 import { generateCatalogId, RegisteredStratumCatalog } from './utils/catalog';
 import { addStratumSnapshotListener } from './utils/env';
 import { normalizeToArray } from './utils/general';
