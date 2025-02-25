@@ -14,12 +14,10 @@ import {
   addGlobalPlugin,
   removeGlobalPlugin
 } from '../src';
-import { BrowserConsolePlugin } from '../src/plugins/browser-console';
-import { NewRelicPlusPlugin } from '../src/plugins/new-relic-plus';
 import { INVALID_SAMPLE_CATALOG, SAMPLE_A_CATALOG } from './utils/catalog';
 import { CATALOG_METADATA, globalWindow, PRODUCT_NAME, PRODUCT_VERSION, SESSION_ID } from './utils/constants';
 import { enableDebugMode, isUuid, mockCrypto, restoreStratumMocks } from './utils/helpers';
-import { PluginAFactory } from './utils/sample-plugin';
+import { PluginAFactory, PluginA, PluginB, SamplePublisher } from './utils/sample-plugin';
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const g = globalThis as any;
@@ -221,8 +219,8 @@ describe('util functions', () => {
   describe('global-plugins', () => {
     it('should get global plugins', async () => {
       // Arrange.
-      const plugin1 = new BrowserConsolePlugin();
-      const plugin2 = new NewRelicPlusPlugin();
+      const plugin1 = new PluginA();
+      const plugin2 = new PluginB({ versionNumber: 1, apiKey: 'api' }, new SamplePublisher('sample'));
       g[GLOBAL_LISTENER_KEY] = {
         globalPlugins: [plugin1, plugin2]
       };
@@ -239,7 +237,7 @@ describe('util functions', () => {
       g[GLOBAL_LISTENER_KEY] = {};
 
       // Act.
-      const plugin = new BrowserConsolePlugin();
+      const plugin = new PluginA();
       addGlobalPlugin(plugin);
 
       // Assert.
@@ -248,13 +246,13 @@ describe('util functions', () => {
 
     it('should remove a plugin from the global namespace', async () => {
       // Arrange.
-      const plugin1 = new BrowserConsolePlugin();
-      const plugin2 = new NewRelicPlusPlugin();
+      const plugin1 = new PluginA();
+      const plugin2 = new PluginB({ versionNumber: 1, apiKey: 'api' }, new SamplePublisher('sample'));
       g[GLOBAL_LISTENER_KEY] = {
         globalPlugins: [plugin1, plugin2]
       };
       // Act.
-      removeGlobalPlugin('browserConsole');
+      removeGlobalPlugin('pluginA');
 
       // Assert.
       expect(g[GLOBAL_LISTENER_KEY].globalPlugins).toEqual([plugin2]);
@@ -262,14 +260,14 @@ describe('util functions', () => {
 
     it('should not remove a plugin that does not exist', async () => {
       // Arrange.
-      const plugin1 = new BrowserConsolePlugin();
-      const plugin2 = new NewRelicPlusPlugin();
+      const plugin1 = new PluginA();
+      const plugin2 = new PluginB({ versionNumber: 1, apiKey: 'api' }, new SamplePublisher('sample'));
       g[GLOBAL_LISTENER_KEY] = {
         globalPlugins: [plugin1, plugin2]
       };
 
       // Act.
-      removeGlobalPlugin('plugin3');
+      removeGlobalPlugin('pluginC');
 
       // Assert.
       expect(g[GLOBAL_LISTENER_KEY].globalPlugins).toEqual([plugin1, plugin2]);
