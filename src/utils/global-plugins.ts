@@ -7,8 +7,8 @@ const g = globalThis as any;
 /**
  * Retrieve the list of plugins from the global namespace
  */
-export function getGlobalPlugins(): GenericPlugin[] | undefined {
-  return g?.[GLOBAL_LISTENER_KEY]?.globalPlugins;
+export function getGlobalPlugins(): GenericPlugin[] {
+  return g?.[GLOBAL_LISTENER_KEY]?.globalPlugins || [];
 }
 
 /**
@@ -16,7 +16,7 @@ export function getGlobalPlugins(): GenericPlugin[] | undefined {
  * @param plugin - GenericPlugin - Plugin to add
  * @returns - GenericPlugin[] - Returns the full list of global plugins after adding.
  */
-export function addGlobalPlugin(plugin: GenericPlugin): GenericPlugin[] | undefined {
+export function addGlobalPlugin(plugin: GenericPlugin): GenericPlugin[] {
   // initialize stratum namespace if not exist
   if (!g[GLOBAL_LISTENER_KEY]) {
     g[GLOBAL_LISTENER_KEY] = {};
