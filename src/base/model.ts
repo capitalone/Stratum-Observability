@@ -16,12 +16,6 @@ export class BaseEventModel<T extends CatalogEvent = CatalogEvent> {
   protected readonly key: CatalogKey;
 
   /**
-   * Underlying catalog item data that populates the event model. This
-   * is received from the catalog on model load.
-   */
-  protected item: T;
-
-  /**
    * Reference to the Injector class instantiated
    * by StratumService.
    */
@@ -33,6 +27,12 @@ export class BaseEventModel<T extends CatalogEvent = CatalogEvent> {
    * checkValidity is called.
    */
   private _isValid = false;
+
+  /**
+   * Underlying catalog item data that populates the event model. This
+   * is received from the catalog on model load.
+   */
+  item: T;
 
   /**
    * ID of the catalog that owns this catalog item.
