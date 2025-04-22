@@ -8,14 +8,12 @@ import {
   GENERATED_DEFAULT_METADATA,
   SESSION_ID,
   CATALOG_METADATA,
-  METADATA_CATALOG_ID
+  METADATA_CATALOG_ID,
+  PLACEHOLDERS
 } from './constants';
 
 export const SAMPLE_EVENT_OPTIONS: Partial<UserDefinedEventOptions> = {
-  replacements: {
-    PLACEHOLDER_1: 'foo',
-    PLACEHOLDER_2: 'bar'
-  }
+  replacements: PLACEHOLDERS
 };
 
 export const NR_MOCK = {

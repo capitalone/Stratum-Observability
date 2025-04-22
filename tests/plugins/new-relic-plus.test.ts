@@ -6,9 +6,9 @@ import {
   NewRelicPlusPlugin,
   NewRelicPlusPluginFactory
 } from '../../src/plugins/new-relic-plus';
-import { AB_TEST_SCHEMA, globalWindow, PRODUCT_NAME, PRODUCT_VERSION } from '../utils/constants';
+import { AB_TEST_SCHEMA, globalWindow, PLACEHOLDERS, PRODUCT_NAME, PRODUCT_VERSION } from '../utils/constants';
 import { NR_CATALOG, SAMPLE_A_CATALOG } from '../utils/catalog';
-import { NR_MOCK } from '../utils/fixtures';
+import { NR_MOCK, SAMPLE_EVENT_OPTIONS } from '../utils/fixtures';
 import { getPublishers, mockNewRelic, mockSessionId, restoreStratumMocks } from '../utils/helpers';
 import { NewRelicPluginFactory, NewRelicPublisher } from '../../src/plugins/new-relic';
 import { PluginAFactory } from '../utils/sample-plugin';
@@ -134,6 +134,26 @@ describe('NewRelicPlusPublisher', () => {
       expect(saveSpy).toHaveBeenCalledTimes(1);
       expect(interactionSpy).toHaveBeenCalledTimes(2);
       expect(endSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle placeholders within the nrApi event type', async () => {
+      const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
+      const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
+      const result = await stratum.publish('nrApiPlaceholders', SAMPLE_EVENT_OPTIONS);
+      expect(result).toBe(true);
+      const publishData = {
+        ...Object.fromEntries(setAttributeSpy.mock.calls),
+        ...{ name: setNameSpy.mock.calls[0][0] }
+      };
+      const catalogEntry = NR_CATALOG.nrApiPlaceholders as any;
+      const propertiesWithPlaceholders = Object.keys(catalogEntry).filter((k) =>
+        String(catalogEntry[k]).includes('{{')
+      );
+      propertiesWithPlaceholders.forEach((key) => {
+        const placeholder = catalogEntry[key].replace(/[{}]/g, '');
+        const placeholderValue = PLACEHOLDERS[placeholder];
+        expect(publishData[key]).toBe(placeholderValue);
+      });
     });
 
     it('should process the nrError event type', async () => {

@@ -141,8 +141,20 @@ export const NR_CATALOG: StratumCatalog<NewRelicEvents> = {
     eventType: NewRelicEventType.ERROR,
     name: 'nrerror',
     description: 'description',
-    id: 104
-  } as any
+    id: 104 // Intentional repeat of already-in-use id
+  } as any,
+  nrApiPlaceholders: {
+    eventType: NewRelicEventType.API_RESPONSE,
+    message: '{{PLACEHOLDER_1}}',
+    featureName: '{{PLACEHOLDER_2}}',
+    name: '{{PLACEHOLDER_3}}',
+    requestHeaders: '{{PLACEHOLDER_4}}',
+    requestUri: '{{PLACEHOLDER_5}}',
+    statusCode: '{{PLACEHOLDER_6}}',
+    statusText: '{{PLACEHOLDER_7}}',
+    description: 'description',
+    id: 105
+  }
 };
 
 export const BASE_CATALOG: StratumCatalog = {
