@@ -95,13 +95,61 @@ export function generateDefaultSessionId(): string {
  */
 export class Logger {
   /**
-   * Write warnings to the console only if debug mode is enabled
+   * Write debug logs to the console only if debug mode is enabled
    */
   debug(...args: unknown[]) {
     if (debugModeEnabled()) {
       console.debug('[Stratum]', ...args);
     }
   }
+
+  /**
+   * Write warn logs to the console only if debug mode is enabled
+   */
+  warn(...args: unknown[]) {
+    if (debugModeEnabled()) {
+      console.warn('[Stratum]', ...args);
+    }
+  }
+
+  /**
+   * Write info logs to the console only if debug mode is enabled
+   */
+  info(...args: unknown[]) {
+    if (debugModeEnabled()) {
+      console.info('[Stratum]', ...args);
+    }
+  }
+
+  /**
+   * Write trace logs to the console only if debug mode is enabled
+   */
+  trace(...args: unknown[]) {
+    if (debugModeEnabled()) {
+      console.trace('[Stratum]', ...args);
+    }
+  }
+
+  /**
+   * Write error logs to the console only if debug mode is enabled
+   */
+  error(...args: unknown[]) {
+    if (debugModeEnabled()) {
+      console.error('[Stratum]', ...args);
+    }
+  }
+}
+
+/**
+ * Generic logging interface.
+ * Used to allow plugins to pass in an instance of their own preferred logging library
+ */
+export interface GenericLogger {
+  debug: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  info: (...args: unknown[]) => void;
+  trace: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
 }
 
 /**
