@@ -63,10 +63,10 @@ export class NewRelicApiResponseEventModel extends NewRelicEventModel<NewRelicAp
   getData(options?: Partial<EventOptions>) {
     const item = super.getData(options);
     return Object.assign(item, {
-      requestHeaders: this.item.requestHeaders,
-      requestUri: this.item.requestUri,
-      statusCode: this.item.statusCode,
-      statusText: this.item.statusText
+      requestHeaders: this.processedNewRelicData.requestHeaders,
+      requestUri: this.processedNewRelicData.requestUri,
+      statusCode: this.processedNewRelicData.statusCode,
+      statusText: this.processedNewRelicData.statusText
     });
   }
 }

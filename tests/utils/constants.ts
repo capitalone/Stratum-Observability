@@ -13,6 +13,16 @@ export const AB_TEST_SCHEMA: AbTestSchema = {
   testWeight: '0.5'
 };
 
+export const PLACEHOLDERS: { [key: string]: string } = {
+  PLACEHOLDER_1: 'foo',
+  PLACEHOLDER_2: 'bar',
+  PLACEHOLDER_3: 'baz',
+  PLACEHOLDER_4: 'tac',
+  PLACEHOLDER_5: 'sod',
+  PLACEHOLDER_6: 'row',
+  PLACEHOLDER_7: 'lop'
+};
+
 export const CATALOG_METADATA: CatalogMetadata = {
   componentName: 'abc-component',
   componentVersion: 'component-version-2.3.4',
