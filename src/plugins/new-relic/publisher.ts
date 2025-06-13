@@ -6,11 +6,20 @@ import { isDefined } from '../../utils/general';
 type NrSpaInteraction = any;
 
 /**
- * Publisher model to send published events to the New Relic SDK
- * https://docs.newrelic.com/docs/browser/new-relic-browser/browser-agent-spa-api/actiontext-browser-spa-api/
- *
- * We specifically reference the window object here because the NR SPA agent is intended to
- * run in browser contexts only.
+ * Publisher for sending Stratum events to New Relic Browser SPA
+ * 
+ * This publisher converts Stratum catalog events into New Relic Browser Interactions,
+ * enabling detailed tracking of user interactions and application events. It:
+ * 
+ * - Maps Stratum event data to New Relic Browser Interaction attributes
+ * - Preserves global context and plugin-specific data
+ * - Handles event naming and attribute management
+ * - Manages interaction lifecycle (start/end/save)
+ * 
+ * The publisher requires the New Relic Browser SPA agent to be available
+ * on the window object. It will only publish events when the agent is present.
+ * 
+ * @see https://docs.newrelic.com/docs/browser/new-relic-browser/browser-agent-spa-api/
  */
 export class NewRelicPublisher extends BasePublisher {
   name = 'newRelic';
@@ -37,7 +46,13 @@ export class NewRelicPublisher extends BasePublisher {
   }
 
   /**
-   * Only allow publishing if the NR SPA agent exists on the window.
+   * Determines if the publisher can send events to New Relic
+   * 
+   * Checks for the presence of the New Relic Browser SPA agent
+   * on the window object. The publisher will only be available
+   * when the agent is properly initialized.
+   * 
+   * @returns Promise resolving to true if the New Relic agent is available
    */
   async isAvailable(): Promise<boolean> {
     return !!this.publisher;
@@ -59,10 +74,23 @@ export class NewRelicPublisher extends BasePublisher {
   }
 
   /**
-   * Helper method to get the default interaction event from the publisher.
-   * This method defines the initial browser interaction and the default
-   * attributes should be populated on all New Relic events,
-   * independent of the event type.
+   * Creates a new Browser Interaction with default attributes
+   * 
+   * Initializes a New Relic Browser Interaction with core Stratum metadata:
+   * - Component information (name, version)
+   * - Catalog details (id, version, event type)
+   * - Product context (name, version)
+   * - Session and event identifiers
+   * - A/B test configurations
+   * 
+   * The interaction is configured with attributes that enable:
+   * - Event correlation across systems
+   * - Component-level tracking
+   * - Session analysis
+   * - A/B test impact measurement
+   * 
+   * @param snapshot The current Stratum event snapshot
+   * @returns Configured New Relic Browser Interaction
    */
   protected getDefaultInteraction(snapshot: StratumSnapshot) {
     /**
@@ -126,9 +154,19 @@ export class NewRelicPublisher extends BasePublisher {
   }
 
   /**
-   * Given a set of event data, begin the interaction tracking, set
-   * related attributes and save BrowserInteraction event to
-   * New Relic based off the default New Relic event.
+   * Publishes event data to New Relic as a Browser Interaction
+   * 
+   * Converts Stratum event data into a New Relic Browser Interaction by:
+   * 1. Creating a new interaction with default attributes
+   * 2. Adding event-specific data as custom attributes
+   * 3. Setting the interaction name if provided
+   * 4. Saving and ending the interaction
+   * 
+   * The interaction is automatically ended to ensure proper
+   * timing and prevent interaction overlap.
+   * 
+   * @param content Event data to publish
+   * @param snapshot Current Stratum event snapshot
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   async publish(content: any, snapshot: StratumSnapshot) {
