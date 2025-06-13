@@ -1,10 +1,26 @@
 # Stratum Observability | standardization as you publish
 
-A no-dependency library defining a framework for sending analytics and observability events in a standardized format.
-Stratum is a plugin-based framework that allows you to create your own custom plugins to define, validate, and publish events
-to your observability stack. We also offer community-driven plugins for popular integrations.
+> Your app speaks Stratum—observability platforms listen.
 
-**Common problems that Stratum helps solve:**
+A no-dependency library defining a framework for sending analytics and observability events in a standardized format. Stratum is a plugin-based framework that allows you to create your own custom plugins to define, validate, and publish events to your observability stack. We also offer community-driven plugins for popular integrations.
+
+
+
+## Background
+### Guiding principles
+1. Stratum does not replace existing tooling, but is meant to standardize how you use it.
+   1. Example: Continue using your favorite analytics or observability platform, but unify event formats and publishing logic by wrapping it in a Stratum plugin shared across all your projects.
+2. Events are first-class citizens—design and document them intentionally.
+   1. Example: Create a catalog of well-defined event types (e.g., FormError, UserStep) with clear schemas, so everyone knows what data is available and how to use it.
+3. Standardization enables better insights and faster problem resolution.
+   1. Example: Use consistent event names and data structures everywhere, so dashboards and alerts are easy to build and maintain.
+4. Flexibility through plugins—customize integrations without losing consistency.
+   1. Example: Build a plugin for a new tool or workflow, but always emit events in the same standardized format as the rest of your stack.
+5. Context is king—share and manage metadata easily, including for A/B testing.
+   1. Example: Use Stratum's global context to automatically attach user IDs, session info, or A/B test group assignments to every event, making it easy to analyze feature experiments and user behavior across your system.
+
+
+### Common problems that Stratum helps solve
 1. Standardized data for clean queries, clear ownership, and strongest possible signals for alerting/reporting
 1. Being the first to know when your app is down, up, or sideways (let alone determining what any of those mean to you)
 1. Clear cataloging of what your product is capable of and who's using what
