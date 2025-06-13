@@ -108,6 +108,7 @@ stratum.publish('user-action');
 ```
 
 This will output to the console:
+
 ```
 BrowserConsolePlugin: {
   event: {
@@ -135,4 +136,4 @@ If you don't see console output:
 
 - [Stratum Observability Documentation](../../README.md)
 - [Plugin Architecture Documentation](../../docs/plugins.md)
-- [Event Catalog Documentation](../../docs/catalog.md) 
+- [Event Catalog Documentation](../../docs/catalog.md)

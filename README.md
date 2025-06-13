@@ -4,10 +4,10 @@
 
 A no-dependency library defining a framework for sending analytics and observability events in a standardized format. Stratum is a plugin-based framework that allows you to create your own custom plugins to define, validate, and publish events to your observability stack. We also offer community-driven plugins for popular integrations.
 
-
-
 ## Background
+
 ### Guiding principles
+
 1. Stratum does not replace existing tooling, but is meant to standardize how you use it.
    1. Example: Continue using your favorite analytics or observability platform, but unify event formats and publishing logic by wrapping it in a Stratum plugin shared across all your projects.
 2. Events are first-class citizens—design and document them intentionally.
@@ -19,8 +19,8 @@ A no-dependency library defining a framework for sending analytics and observabi
 5. Context is king—share and manage metadata easily, including for A/B testing.
    1. Example: Use Stratum's global context to automatically attach user IDs, session info, or A/B test group assignments to every event, making it easy to analyze feature experiments and user behavior across your system.
 
-
 ### Common problems that Stratum helps solve
+
 1. Standardized data for clean queries, clear ownership, and strongest possible signals for alerting/reporting
 1. Being the first to know when your app is down, up, or sideways (let alone determining what any of those mean to you)
 1. Clear cataloging of what your product is capable of and who's using what
@@ -49,11 +49,13 @@ For detailed examples and implementation patterns, please see [EXAMPLES.md](EXAM
 ## Installation
 
 **Via npm:**
+
 ```bash
 npm install @capitalone/stratum-observability
 ```
 
 **Via yarn:**
+
 ```bash
 yarn add @capitalone/stratum-observability
 ```
@@ -65,18 +67,21 @@ For detailed examples of creating custom plugins, including plugin factories, ca
 ## Architecture
 
 Stratum is built around a core service class (`StratumService`) that manages:
+
 - Plugin registration and lifecycle
 - Event catalog management
 - Event publishing pipeline
 - Global context and state
 
 The framework uses a publisher-subscriber pattern where:
+
 1. Events are defined in catalogs
 2. Plugins provide event models and publishers
 3. Publishers handle the actual sending of events to external systems
 
 ## Contributing
-We welcome and appreciate your contributions! 
+
+We welcome and appreciate your contributions!
 
 If you have suggestions or find a bug, please [open an issue](https://github.com/capitalone/Stratum-Observability/issues/new/choose).
 

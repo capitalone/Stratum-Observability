@@ -5,6 +5,7 @@ This document contains example implementations and usage patterns for Stratum Ob
 ## Basic Implementation
 
 A typical Stratum implementation consists of:
+
 1. Stratum Catalog - single source of truth for the voice of your application
 1. Shared StratumService instance to load plugins and publish events from
 1. Functional code aka your application code! Any files containing logic you'd like to observe
@@ -14,7 +15,7 @@ A typical Stratum implementation consists of:
   import { NewRelicPluginFactory } from '@capitalone/stratum-observability/plugins/new-relic';
 
   /**
-   * Using enumerated keys afford the best chance of consistent references throughout your application. 
+   * Using enumerated keys afford the best chance of consistent references throughout your application.
    * This replaces the need to hard code string values as reference.
    */
   export const EventKey = {
@@ -22,16 +23,16 @@ A typical Stratum implementation consists of:
   };
 
   /**
-   * Initialize Stratum with required arguments, again 
+   * Initialize Stratum with required arguments, again
    * typically within a shared file for re-use.
-   * 
+   *
    * The StratumService is the engine for publishing.
    */
   export const stratumService = new StratumService({
     /**
      * 1+ plugins defining your standardized event schemas and how to
      * map these schemas when published to your data collectors
-     * 
+     *
      * The NewRelicPlugin is available from the @capitalone/stratum-observability library
      */
     plugins: [NewRelicPluginFactory()],
@@ -42,18 +43,18 @@ A typical Stratum implementation consists of:
     productName: 'stratumExampleApp',
 
     /**
-     * Typically, this references the version of the application you're 
+     * Typically, this references the version of the application you're
      * publishing observability events from
      */
     productVersion: 'REPLACE_WITH_PRODUCT_VERSION',
 
     /**
-     * Your "catalog" or dictionary serves as the source-of-truth of events 
+     * Your "catalog" or dictionary serves as the source-of-truth of events
      * published by an application. This provides the structure for standardization.
-     * 
+     *
      * Custom plugins allow you to define your own catalog events, attributes,
      * and custom validation rules.
-     * 
+     *
      * We've added an example event for the sake of getting started.
      */
     catalog: {
@@ -70,7 +71,7 @@ A typical Stratum implementation consists of:
   /**
    * Publish your event via Stratum. In this example, Stratum will send your event
    * to New Relic's Browser Agent, if available on the webpage.
-   * 
+   *
    * (see: https://docs.newrelic.com/docs/browser/browser-monitoring/getting-started/introduction-browser-monitoring/)
    */
   stratumService.publish(EventKey.LOADED);
@@ -84,7 +85,7 @@ A typical Stratum implementation consists of:
 import { BasePlugin } from '@capitalone/stratum-observability';
 
 /**
- * For TypeScript support, BasePlugin accepts types for 
+ * For TypeScript support, BasePlugin accepts types for
  */
 export class SimplePlugin extends BasePlugin<never, never> {
   name: 'mySimplePlugin',
@@ -141,11 +142,11 @@ interface SimpleEvent extends StratumEvent<SimpleEventType> {
 /**
  * A catalog composed of SimpleEvents can then
  * be defined.
- * 
+ *
  * If you do not provide your custom event type interface as a generic
  * to the StratumCatalog type, ype-hinting for required properties
- * will not be available. 
- * 
+ * will not be available.
+ *
  * Multiple custom event type interfaces can be added as a union:
  * `StratumCatalog<SimpleEvent | ComplexEvent>`
  */
@@ -202,7 +203,7 @@ export class SimplePublisher extends BasePublisher<ExternalEventSchema> {
    * Required
    * Check if your publisher source is available (aka scripts installed, environment
    * is set up, etc.)
-   * 
+   *
    * In this case, we make sure that console.log() is accessible.
    */
   async isAvailable(_model: SimpleEventModel) {
@@ -224,11 +225,11 @@ export class SimplePublisher extends BasePublisher<ExternalEventSchema> {
   /**
    * Required
    * Send your simple event content to the external publisher
-   * 
+   *
    * In this, case we publish the event to the console log
    */
   async publish(event: ExternalEventSchema) {
     console.log('publishing simple event!', { id: event.id, simpleValue: event.simpleValue });
   }
 }
-``` 
+```

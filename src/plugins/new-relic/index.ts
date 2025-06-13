@@ -10,7 +10,7 @@ import { NewRelicPublisher } from './publisher';
  * - Converting Stratum catalog events into New Relic Browser Interactions
  * - Preserving event context and metadata across the integration
  * - Supporting custom attributes and event naming
- * 
+ *
  * The plugin requires the New Relic Browser SPA agent to be initialized in your application.
  * Events are published as Browser Interactions.
  */
@@ -21,10 +21,10 @@ export class NewRelicPlugin extends BasePlugin<never, never> {
 
 /**
  * Factory function for creating New Relic plugin instances
- * 
+ *
  * Use this function when registering the New Relic plugin with Stratum.
  * The factory pattern ensures proper initialization and dependency injection.
- * 
+ *
  * @returns A configured instance of the NewRelicPlugin
  */
 export const NewRelicPluginFactory: PluginFactory<NewRelicPlugin> = () => new NewRelicPlugin();

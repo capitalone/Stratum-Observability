@@ -9,7 +9,9 @@ The New Relic Plus plugin extends Stratum's New Relic integration with specializ
 ## Event Types
 
 ### General Event (`nrEvent`)
+
 Track feature usage and application state:
+
 ```typescript
 {
   name: string;           // What happened
@@ -19,7 +21,9 @@ Track feature usage and application state:
 ```
 
 ### API Response Event (`nrApiResponse`)
+
 Monitor API performance and reliability:
+
 ```typescript
 {
   requestUri: string;     // Endpoint
@@ -30,7 +34,9 @@ Monitor API performance and reliability:
 ```
 
 ### Error Event (`nrError`)
+
 Track application errors with user impact:
+
 ```typescript
 {
   errorCode: string;      // Error identifier
@@ -60,6 +66,7 @@ stratum.registerPlugin(newRelicPlus);
 To add a new event type to the plugin:
 
 1. Add the event type to `constants.ts`:
+
 ```typescript
 export enum NewRelicEventType {
   CUSTOM = 'nrCustom',
@@ -68,6 +75,7 @@ export enum NewRelicEventType {
 ```
 
 2. Define your event structure in `types.ts`:
+
 ```typescript
 export interface NewRelicCustomEvent extends NewRelicEvent<NewRelicEventType.CUSTOM> {
   // Your custom fields here
@@ -76,6 +84,7 @@ export interface NewRelicCustomEvent extends NewRelicEvent<NewRelicEventType.CUS
 ```
 
 3. Create a model in `model.ts`:
+
 ```typescript
 export class NewRelicCustomEventModel extends NewRelicEventModel<NewRelicCustomEvent> {
   protected checkValidity(): boolean {
@@ -95,6 +104,7 @@ export class NewRelicCustomEventModel extends NewRelicEventModel<NewRelicCustomE
 ```
 
 The `processedNewRelicData` property contains the event data after it has been processed by the base model. This includes:
+
 - Dynamic placeholder replacement
 - Context enrichment
 - Data validation
@@ -103,6 +113,7 @@ The `processedNewRelicData` property contains the event data after it has been p
 Use this property in your `getData` method to access the processed values that will be sent to New Relic.
 
 4. Register the new event type in the plugin:
+
 ```typescript
 eventTypes = {
   [NewRelicEventType.CUSTOM]: NewRelicCustomEventModel,

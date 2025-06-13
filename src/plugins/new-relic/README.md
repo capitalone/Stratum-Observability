@@ -79,11 +79,13 @@ addGlobalPlugin(NewRelicPluginFactory());
 The plugin's simplicity is its strength - it processes all events using only the base Stratum snapshot data. This means:
 
 1. **No Special Configuration Required**
+
    - Works with any event type in your catalog
    - No need to define plugin-specific event structures
    - No additional data transformations needed
 
 2. **Direct Base Snapshot Processing**
+
    - All event data is processed directly from the base snapshot
    - No intermediate data structures or transformations
    - Preserves all original event data and context
@@ -148,4 +150,4 @@ If events are not appearing in New Relic:
 - [Stratum Observability Documentation](../../README.md)
 - [Plugin Architecture Documentation](../../docs/plugins.md)
 - [Event Catalog Documentation](../../docs/catalog.md)
-- [New Relic Browser SPA Documentation](https://docs.newrelic.com/docs/browser/new-relic-browser/browser-agent-spa-api/) 
+- [New Relic Browser SPA Documentation](https://docs.newrelic.com/docs/browser/new-relic-browser/browser-agent-spa-api/)

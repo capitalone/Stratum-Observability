@@ -3,7 +3,7 @@ import { StratumSnapshot } from '../../types';
 
 /**
  * Browser Console Publisher
- * 
+ *
  * This publisher logs all Stratum events to the browser console with detailed
  * information about the event, including event data, plugin context, global context,
  * catalog metadata, and session information.
