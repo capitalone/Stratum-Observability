@@ -3,6 +3,10 @@ import { StratumSnapshot } from '../../types';
 
 /**
  * Browser Console Publisher
+ * 
+ * This publisher logs all Stratum events to the browser console with detailed
+ * information about the event, including event data, plugin context, global context,
+ * catalog metadata, and session information.
  */
 export class BrowserConsolePublisher extends BasePublisher {
   name = 'browserConsole';
@@ -16,35 +20,31 @@ export class BrowserConsolePublisher extends BasePublisher {
   }
 
   /**
-   * Required
-   * Returns data from underlying events to utilize
-   * in the publish step.
-   *
-   * In this case, we send the stringified event data to be logged in the console.
+   * Returns the full snapshot data to be logged in the console.
+   * This includes:
+   * - Event type and ID
+   * - Event data
+   * - Plugin context
+   * - Global context
+   * - Catalog metadata
+   * - Session information
    */
   getEventOutput(_event: BaseEventModel, snapshot: StratumSnapshot): string {
-    return JSON.stringify(snapshot.event);
+    return JSON.stringify(snapshot, null, 2);
   }
 
   /**
-   * Required
-   * Check if your publisher source is available (aka scripts installed, environment
-   * is set up, etc.)
-   *
-   * In this case, we make sure that console.log() is accessible.
+   * Check if the browser console is available for logging.
    */
   async isAvailable(): Promise<boolean> {
     return typeof console !== 'undefined';
   }
 
   /**
-   * Required
-   * Send your content to the external publisher
-   *
-   * In this, case we publish the stringified event data to the console.
+   * Log the event data to the browser console.
+   * The output is prefixed with the plugin name for easy identification.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   async publish(content: string): Promise<void> {
-    console.log(`BrowserConsolePlugin: ${content}`);
+    console.log('BrowserConsolePlugin:', content);
   }
 }
