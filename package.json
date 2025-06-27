@@ -52,7 +52,7 @@
   "sideEffects": false,
   "types": "dist/types/index.d.ts",
   "devDependencies": {
-    "@rollup/plugin-replace": "^5.0.7",
+    "@rollup/plugin-replace": "^6.0.2",
     "@rollup/plugin-terser": "^0.4.4",
     "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
@@ -65,7 +65,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.3",
-    "rollup": "^4.18.1",
+    "rollup": "^4.44.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "semver": "^7.6.2",
     "shelljs": "^0.8.5",
