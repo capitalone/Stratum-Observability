@@ -166,14 +166,14 @@ describe('stratum service base functionality', () => {
     expect(stratum.publishers[1]).toBeInstanceOf(BrowserConsolePublisher);
   });
 
-  it('should prevent multiple catalogs with the same id to be instantiated', () => {
+  it('should return catalog id even for duplicate catalogs', () => {
     // Add a standard catalog
     stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
     expect(Object.keys(stratum.catalogs)).toHaveLength(2);
 
     // Attempt to add another catalog with the same metadata
     const id = stratum.addCatalog({ items: {}, ...CATALOG_METADATA });
-    expect(id).toBe('');
+    expect(id).toBe(METADATA_CATALOG_ID);
     expect(Object.keys(stratum.catalogs)).toHaveLength(2);
 
     // Update the metadata

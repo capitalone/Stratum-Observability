@@ -107,16 +107,16 @@ export class StratumService {
    * Note: catalog item ids do not need to be unique across catalogs.
    *
    * @param {UserDefinedCatalogOptions} options - Catalog items and optional catalog version
-   * @return {string | undefined} Catalog id of newly registered catalog. Undefined if
-   *   catalog has already been registered.
+   * @return {string} Catalog id of newly registered catalog
    */
   addCatalog(options: UserDefinedCatalogOptions): string {
     const id = generateCatalogId(options, this.injector.productName, this.injector.productVersion);
     if (this.catalogs[id]) {
       this.injector.logger.debug(`Unable to register duplicate catalog "${id}"`);
-      return '';
+    } else {
+      this.catalogs[id] = new RegisteredStratumCatalog(id, options, this.injector);
     }
-    this.catalogs[id] = new RegisteredStratumCatalog(id, options, this.injector);
+
     return id;
   }
 
