@@ -68,7 +68,7 @@ A typical Stratum implementation consists of:
         [EventKey.LOADED]: {
           eventType: 'base', // The base event type for Stratum events
           description: 'This application has loaded for the first time',
-          id: 1 // Very important reference identifier -- the key to simple queries
+          id: 1 // Very important reference identifier -- the key to simple queries (can be omitted to use the event key as id)
         }
       }
     }

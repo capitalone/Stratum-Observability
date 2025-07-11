@@ -77,7 +77,7 @@ export class BaseEventModel<T extends CatalogEvent = CatalogEvent> {
    * Getter function to return the id of the catalog item.
    */
   get id() {
-    return this.item.id;
+    return this.item.id ?? this.key;
   }
 
   /**
