@@ -97,7 +97,7 @@ describe('util functions', () => {
         expect(Object.keys(catalog.validModels)).toHaveLength(1);
         expect(Object.keys(catalog.errors)).toHaveLength(4);
         expect(catalog.errors[0].errors).toHaveLength(1);
-        expect(catalog.errors[1].errors).toHaveLength(2);
+        expect(catalog.errors[1].errors).toHaveLength(1);
         expect(catalog.errors[3].errors).toHaveLength(1);
         expect(catalog.errors['duplicate'].errors).toHaveLength(1);
       });

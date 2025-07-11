@@ -92,7 +92,10 @@ describe('stratum service base functionality', () => {
     expect(catalog.validModels[4]).toBeInstanceOf(AModel);
 
     expect(Object.keys(stratum.injector.registeredEventIds)).toHaveLength(1);
-    const idObject = Object.values(SAMPLE_A_CATALOG).reduce((obj, x) => Object.assign(obj, { [x.id]: true }), {});
+    const idObject = Object.entries(SAMPLE_A_CATALOG).reduce(
+      (obj, [key, x]) => Object.assign(obj, { [x.id ?? key]: true }),
+      {}
+    );
     expect(stratum.injector.registeredEventIds[METADATA_CATALOG_ID]).toEqual(idObject);
   });
 
@@ -107,7 +110,10 @@ describe('stratum service base functionality', () => {
     expect(Object.keys(catalog?.validModels)).toHaveLength(catalog1Length);
 
     expect(Object.keys(stratum.injector.registeredEventIds)).toHaveLength(1);
-    const idObject = Object.values(SAMPLE_A_CATALOG).reduce((obj, x) => Object.assign(obj, { [x.id]: true }), {});
+    const idObject = Object.entries(SAMPLE_A_CATALOG).reduce(
+      (obj, [key, x]) => Object.assign(obj, { [x.id ?? key]: true }),
+      {}
+    );
     expect(stratum.injector.registeredEventIds[DEFAULT_CATALOG_ID]).toEqual(idObject);
   });
 
