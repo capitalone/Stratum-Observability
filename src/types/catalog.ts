@@ -34,7 +34,7 @@ export interface CatalogEvent<EventType extends string = string> {
   /**
    * Unique identifier for the item within the catalog
    */
-  id: EventId;
+  id?: EventId;
 }
 
 /**
