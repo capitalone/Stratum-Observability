@@ -165,7 +165,6 @@ export const BASE_CATALOG: StratumCatalog = {
   },
   2: {
     eventType: 'base',
-    description: 'base event 2',
-    id: 2
+    description: 'base event 2'
   }
 };

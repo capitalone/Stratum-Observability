@@ -10,6 +10,10 @@ export type EventId = number | string;
 /**
  * Union of types that can be used to reference items
  * within a stratum catalog.
+ *
+ * Object keys are coerced to strings, so even if
+ * the key is defined and referenced numerically,
+ * the actual key values stored will be a string.
  */
 export type CatalogKey = number | string;
 

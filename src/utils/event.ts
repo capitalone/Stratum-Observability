@@ -108,7 +108,8 @@ export function generateStratumSnapshot(
     stratumVersion: injector.version,
     event: {
       eventType: model.eventType,
-      id: model.id
+      id: model.id,
+      key: model.key
     },
     eventOptions: options
   });

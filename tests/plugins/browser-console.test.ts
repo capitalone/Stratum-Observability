@@ -1,4 +1,4 @@
-import { BasePublisher, StratumService } from '../../src';
+import { StratumService } from '../../src';
 import {
   BrowserConsolePlugin,
   BrowserConsolePluginFactory,
@@ -11,9 +11,11 @@ import { BASE_CATALOG } from '../utils/catalog';
 describe('browser console plugin', () => {
   let stratum: StratumService;
   let plugin: BrowserConsolePlugin;
-  let publisher: BasePublisher;
+  let publisher: BrowserConsolePublisher;
+  let consoleSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    consoleSpy = jest.spyOn(console, 'log').mockImplementation();
     plugin = BrowserConsolePluginFactory();
     stratum = new StratumService({
       catalog: { items: BASE_CATALOG, ...CATALOG_METADATA },
@@ -21,7 +23,7 @@ describe('browser console plugin', () => {
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION
     });
-    publisher = stratum.publishers[0];
+    publisher = plugin.publishers[0];
   });
 
   afterEach(() => {
@@ -39,28 +41,37 @@ describe('browser console plugin', () => {
   });
 
   it('should publish and log events to the console', async () => {
-    expect(publisher).toBeInstanceOf(BrowserConsolePublisher);
-
     const publishSpy = jest.spyOn(publisher, 'publish');
-    const consoleSpy = jest.spyOn(console, 'log');
 
+    const expectedContent = JSON.stringify({
+      eventType: BASE_CATALOG[1].eventType,
+      id: BASE_CATALOG[1].id,
+      key: '1'
+    });
+    const expectedLoggedMessage = `BrowserConsolePlugin: ${expectedContent}`;
     let result = await stratum.publish(1);
-    let expectedContent = `{"eventType":"${BASE_CATALOG[1].eventType}","id":${BASE_CATALOG[1].id}}`;
-    let expectedLoggedMessage = `BrowserConsolePlugin: ${expectedContent}`;
 
     expect(result).toBe(true);
+    expect(publishSpy).toHaveBeenCalledTimes(1);
+    expect(consoleSpy).toHaveBeenCalledTimes(1);
     expect(publishSpy).toHaveBeenCalledWith(expectedContent, expect.anything());
     expect(consoleSpy).toHaveBeenCalledWith(expectedLoggedMessage);
 
-    expectedContent = `{"eventType":"${BASE_CATALOG[2].eventType}","id":${BASE_CATALOG[2].id}}`;
-    expectedLoggedMessage = `BrowserConsolePlugin: ${expectedContent}`;
+    publishSpy.mockClear();
+    consoleSpy.mockClear();
+
+    const expectedContent2 = JSON.stringify({
+      eventType: BASE_CATALOG[2].eventType,
+      id: '2',
+      key: '2'
+    });
+    const expectedLoggedMessage2 = `BrowserConsolePlugin: ${expectedContent2}`;
     result = await stratum.publish(2);
 
     expect(result).toBe(true);
-    expect(publishSpy).toHaveBeenCalledWith(expectedContent, expect.anything());
-    expect(consoleSpy).toHaveBeenCalledWith(expectedLoggedMessage);
-
-    expect(publishSpy).toHaveBeenCalledTimes(2);
-    expect(consoleSpy).toHaveBeenCalledTimes(2);
+    expect(publishSpy).toHaveBeenCalledTimes(1);
+    expect(consoleSpy).toHaveBeenCalledTimes(1);
+    expect(publishSpy).toHaveBeenCalledWith(expectedContent2, expect.anything());
+    expect(consoleSpy).toHaveBeenCalledWith(expectedLoggedMessage2);
   });
 });

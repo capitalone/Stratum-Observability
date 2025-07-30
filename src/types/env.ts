@@ -54,6 +54,7 @@ export interface StratumSnapshot {
   event: {
     eventType: string;
     id: EventId;
+    key: string;
   };
   eventOptions?: Partial<EventOptions>;
 }

@@ -115,6 +115,7 @@ export const BASE_EVENT_MOCK: StratumSnapshot = {
   stratumVersion: STRATUM_LIBRARY_VERSION_PLACEHOLDER,
   event: {
     eventType: 'base',
-    id: 1
+    id: 1,
+    key: '1'
   }
 };
