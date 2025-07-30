@@ -1,4 +1,4 @@
-import type { CatalogEvent, CatalogKey, EventOptions } from '../types';
+import type { CatalogEvent, EventOptions } from '../types';
 import { clone, performReplacements } from '../utils/event';
 import { Injector } from '../utils/injector';
 
@@ -13,7 +13,7 @@ export class BaseEventModel<T extends CatalogEvent = CatalogEvent> {
    * Stored value indicating the key used by the external
    * application to reference the cataloge item.
    */
-  protected readonly key: CatalogKey;
+  readonly key: string;
 
   /**
    * Reference to the Injector class instantiated
@@ -56,7 +56,7 @@ export class BaseEventModel<T extends CatalogEvent = CatalogEvent> {
   /**
    * Checks validity of underlying catalog item data
    */
-  constructor(key: CatalogKey, item: T, catalogId: string, injector: Injector) {
+  constructor(key: string, item: T, catalogId: string, injector: Injector) {
     this.key = key;
     this.item = clone(item);
     this.catalogId = catalogId;

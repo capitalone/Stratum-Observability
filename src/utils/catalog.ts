@@ -1,12 +1,5 @@
 import { BaseEventModel } from '../base';
-import type {
-  CatalogErrors,
-  CatalogEvent,
-  CatalogKey,
-  CatalogMetadata,
-  StratumCatalog,
-  UserDefinedCatalogOptions
-} from '../types';
+import type { CatalogErrors, CatalogEvent, CatalogMetadata, StratumCatalog, UserDefinedCatalogOptions } from '../types';
 import { Injector } from './injector';
 
 /**
@@ -50,7 +43,7 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent> {
    * This is list is referenced by the publishFromCatalog function when determining
    * if a catalog item can be published from the service.
    */
-  readonly validModels: { [key in CatalogKey]: BaseEventModel<T> } = {};
+  readonly validModels: { [key in string]: BaseEventModel<T> } = {};
 
   /**
    * Initializes the RegisteredStratumCatalog class. On initialization, the following
@@ -143,12 +136,12 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent> {
    * If the underlying item can populate an event model, the instantiated model is returned.
    * The validity of the model is known via model.isValid.
    *
-   * @param {CatalogKey} key - Key
+   * @param {string} key - Key
    * @param {T} item - Catalog item of unknown event type
    * @return {BaseEventModel<T> | string} Event model instance or error message if a model for the
    *   cannot be found
    */
-  private getEventModel(key: CatalogKey, item: T): BaseEventModel<T> | string {
+  private getEventModel(key: string, item: T): BaseEventModel<T> | string {
     const eventType = item?.eventType;
     if (!eventType || !(eventType in this.injector.eventTypeModelMap)) {
       return `Event type "${eventType}" not found.`;
