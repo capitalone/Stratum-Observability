@@ -25,7 +25,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm run ci:pipeline
 
       - name: Build library
         run: npm run build
@@ -47,7 +47,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm run ci:pipeline
 
       - name: Build library
         run: npm run build
@@ -70,7 +70,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm run ci:pipeline
 
       - name: Lint code
         run: npm run prettier:check && npm run lint:check
