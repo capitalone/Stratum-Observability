@@ -45,9 +45,12 @@ export interface CatalogEvent<EventType extends string = string> {
  * Collection of CatalogEvents keyed by a CatalogKey.
  *
  * For improved type hinting, explicitly define the catalog item
- * interfaces via the generic property.
+ * type via the generic T. The K generic constrains the keys allowed
+ * in the catalog for type-safe publishing.
  */
-export type StratumCatalog<T extends CatalogEvent = CatalogEvent<'base'>> = { [key in CatalogKey]: T };
+export type StratumCatalog<T extends CatalogEvent = CatalogEvent<'base'>, K extends CatalogKey = CatalogKey> = {
+  [key in K]: T;
+};
 
 /**
  * List of keys associated with invalid catalog items determined during
@@ -99,23 +102,24 @@ export interface CatalogMetadata {
  * User-definable stratum catalog options that can be specified by consuming apps.
  * All metadata is optional but the catalog itself is required.
  */
-export interface UserDefinedCatalogOptions<T extends CatalogEvent = CatalogEvent> extends Partial<CatalogMetadata> {
+export interface UserDefinedCatalogOptions<T extends CatalogEvent = CatalogEvent, K extends CatalogKey = CatalogKey>
+  extends Partial<CatalogMetadata> {
   /**
    * Collection of catalog items to import into stratum.
    */
-  items: StratumCatalog<T>;
+  items: StratumCatalog<T, K>;
 }
 
 /**
  * The available catalog options that define the "default stratum catalog" on
  * initialization of the StratumService
  */
-export interface DefaultCatalogOptions<T extends CatalogEvent = CatalogEvent>
+export interface DefaultCatalogOptions<T extends CatalogEvent = CatalogEvent, K extends CatalogKey = CatalogKey>
   extends Partial<Pick<CatalogMetadata, 'catalogVersion'>> {
   /**
    * Collection of catalog items to import into stratum.
    */
-  items: StratumCatalog<T>;
+  items: StratumCatalog<T, K>;
 }
 
 /**
@@ -123,7 +127,9 @@ export interface DefaultCatalogOptions<T extends CatalogEvent = CatalogEvent>
  * catalog metadata. All fields in a catalog are required, but the metadata can
  * has default values and does not necessarily have to be defined by the user
  */
-export type CatalogOptions<T extends CatalogEvent = CatalogEvent> = Required<UserDefinedCatalogOptions<T>>;
+export type CatalogOptions<T extends CatalogEvent = CatalogEvent, K extends CatalogKey = CatalogKey> = Required<
+  UserDefinedCatalogOptions<T, K>
+>;
 
 /**
  * Context-specific options that are used to dynamically alter catalog item data
@@ -245,3 +251,13 @@ export interface EventTypeModelMap {
     model: typeof BaseEventModel;
   };
 }
+
+/**
+ * Callback function for catalog-level publishing. This callback is passed into
+ * the registered catalog on construction.
+ */
+export type CatalogPublishFn = (
+  id: string,
+  key: CatalogKey,
+  options?: Partial<UserDefinedEventOptions>
+) => Promise<boolean>;

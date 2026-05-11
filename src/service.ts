@@ -2,6 +2,7 @@ import { BasePublisher } from './base';
 import type {
   AbTest,
   AbTestSchema,
+  CatalogEvent,
   CatalogKey,
   GenericPlugin,
   StratumServiceOptions,
@@ -85,39 +86,40 @@ export class StratumService {
 
     // Register the default catalog
     if (options.catalog) {
-      const id = this.addCatalog(options.catalog);
-      if (id) {
-        this.defaultCatalog = this.catalogs[id];
-      }
+      this.defaultCatalog = this.addCatalog(options.catalog);
     }
   }
 
   /**
-   * Register a new catalog within the service. On registration, the catalog
-   * validation and conversion into models occurs. the service will create a composite
-   * catalog id for the catalog based on the provided metadata.
+   * Register a new catalog within the service or return an existing catalog.
+   * On registration, the catalog validation and conversion into models occurs.
+   * The service will create a composite catalog id for the catalog based on
+   * the provided metadata.
    *
-   * If a unique catalog id can be generated, the catalog will end up in the
-   * `catalogs` object, even if it fails validation. If a unique catalog id cannot
-   * be generated, the catalog will not be registered.
+   * If a catalog with same id already exists, the provided items are added to
+   * the existing catalog via addItems and that catalog is returned.
    *
-   * Catalogs registered via this function outside the constructor should reference
-   * the catalog via the generated catalog id.
+   * Returns the registered catalog instance for direct publishing via
+   * `catalog.publish(key)`
    *
    * Note: catalog item ids do not need to be unique across catalogs.
    *
-   * @param {UserDefinedCatalogOptions} options - Catalog items and optional catalog version
-   * @return {string} Catalog id of newly registered catalog
+   * @param {UserDefinedCatalogOptions<T, K>} options - Catalog items and optional catalog version
+   * @return {RegisteredStratumCatalog<T, K>} The registered catalog instance
    */
-  addCatalog(options: UserDefinedCatalogOptions): string {
+  addCatalog<T extends CatalogEvent = CatalogEvent, K extends CatalogKey = CatalogKey>(
+    options: UserDefinedCatalogOptions<T, K>
+  ): RegisteredStratumCatalog<T, K> {
     const id = generateCatalogId(options, this.injector.productName, this.injector.productVersion);
     if (this.catalogs[id]) {
-      this.injector.logger.debug(`Unable to register duplicate catalog "${id}"`);
-    } else {
-      this.catalogs[id] = new RegisteredStratumCatalog(id, options, this.injector);
+      const existing = this.catalogs[id] as RegisteredStratumCatalog<T, K>;
+      existing.addItems(options.items);
+      return existing;
     }
 
-    return id;
+    const catalog = new RegisteredStratumCatalog(id, options, this.injector, this.publishFromCatalog.bind(this));
+    this.catalogs[id] = catalog;
+    return catalog;
   }
 
   /**
@@ -149,7 +151,7 @@ export class StratumService {
         this.publishers.push(publisher);
       });
       // Execute plugin onRegister hook after we're done registering models and publishers
-      plugin.onRegister(this.injector);
+      plugin.onRegister(this.injector, { addCatalog: this.addCatalog.bind(this) });
     });
   }
 
