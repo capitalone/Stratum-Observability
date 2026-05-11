@@ -1,4 +1,4 @@
-import { PluginContext, PluginOptions } from '../types';
+import { PluginContext, PluginHooks, PluginOptions } from '../types';
 import { Injector } from '../utils';
 import { BaseEventModel } from './model';
 import { BasePublisher } from './publisher';
@@ -117,9 +117,10 @@ export abstract class BasePlugin<T extends PluginContext, U extends PluginOption
    * to the plugin or to perform any additional setup.
    *
    * @property {Injector} injector - Stratum service injector instance
+   * @property {PluginHooks} hooks - Scoped service capabilities
    */
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  onRegister(_injector: Injector) {
+  onRegister(_injector: Injector, _hooks: PluginHooks) {
     // Do nothing by default
   }
 }
