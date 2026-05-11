@@ -126,6 +126,16 @@ describe('util functions', () => {
         expect(Object.keys(catalog.errors)).toHaveLength(Object.keys(INVALID_SAMPLE_CATALOG).length);
       });
 
+      it('should recover isValid when failed keys are re-added successfully', () => {
+        const invalidItems = { 1: INVALID_SAMPLE_CATALOG[1] };
+        const options = { items: invalidItems, ...CATALOG_METADATA };
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
+        expect(catalog.isValid).toBe(false);
+        catalog.addItems(SAMPLE_A_CATALOG);
+        expect(catalog.isValid).toBe(true);
+        expect(Object.keys(catalog.errors)).toHaveLength(0);
+      });
+
       it('should delegate publish to the provided publishFn', async () => {
         publishFn.mockResolvedValue(true);
         const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);

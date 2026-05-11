@@ -198,9 +198,9 @@ const catalog = {
 ```
 
 #### Type-safe keys with `satisfies`
-Using `satisfies StratumCatalog<T>` instead of `: StratumCatalog<T>` preserves literal key types. This enables compile-time key checking when publishing via `catalog.publish()` from `RegistereStratumCatalog` instance (via `addCatalog()`).
+Using `satisfies StratumCatalog<T>` instead of `: StratumCatalog<T>` preserves literal key types. This enables compile-time key checking when publishing via `catalog.publish()` from `RegisteredStratumCatalog` instance (via `addCatalog()`).
 
-Note: type-safe keys only apply to catalog-level publishing. Publishing through the servie (`stratum.publish(key)`) does not support compile-type key checking.
+Note: type-safe keys only apply to catalog-level publishing. Publishing through the service (`stratum.publish(key)`) does not support compile-time key checking.
 
 ### Event models
 ```javascript

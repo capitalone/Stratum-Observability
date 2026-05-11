@@ -9,8 +9,8 @@ export interface PluginHooks {
   /**
    * Register a new catalog and receive the catalog instance for direct publishing.
    *
-   * @param {RegisteredStratumCatalog<T, K>} options - Catalog items and optional metadata
-   * @returns The registered catalog instance
+   * @param {UserDefinedCatalogOptions<T, K>} options - Catalog items and optional metadata
+   * @returns {RegisteredStratumCatalog<T, K>} The registered catalog instance
    */
   addCatalog<T extends CatalogEvent, K extends CatalogKey = CatalogKey>(
     options: UserDefinedCatalogOptions<T, K>

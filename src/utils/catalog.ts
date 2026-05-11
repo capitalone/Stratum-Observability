@@ -109,10 +109,9 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent, K e
    * the same key was added over the catalog creation.
    *
    * @param {StratumCatalog<T, Y>} items Incoming catalog items
-   * @return {RegisteredStratumCatalog<T, K | Y} The same catalog instance with a widened keyset
+   * @return {RegisteredStratumCatalog<T, K | Y>} The same catalog instance with a widened keyset
    */
   addItems<Y extends CatalogKey>(items: StratumCatalog<T, Y>): RegisteredStratumCatalog<T, K | Y> {
-    let isCatalogValid = true;
     for (const [key, item] of Object.entries(items)) {
       const errors = [];
       if (key in this.validModels) {
@@ -125,13 +124,13 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent, K e
           if (model.isValid) {
             this.validModels[key] = model;
             this.injector.registerEventId(this.id, model.id);
+            delete this.errors[key];
           } else {
             errors.push(...model.validationErrors);
           }
         }
       }
       if (errors.length) {
-        isCatalogValid = false;
         if (key in this.errors) {
           this.errors[key].errors.push(...errors);
         } else {
@@ -141,7 +140,7 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent, K e
         }
       }
     }
-    this.isValid = this.isValid && isCatalogValid;
+    this.isValid = Object.keys(this.errors).length === 0;
     return this;
   }
 
