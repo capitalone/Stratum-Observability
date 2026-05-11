@@ -111,7 +111,7 @@ describe('publishing events via NewRelicPublisher', () => {
     });
     const nrpPlugin = NewRelicPlusPluginFactory();
     stratum.addPlugin(nrpPlugin);
-    const id = stratum.addCatalog({ items: NR_CATALOG, ...CATALOG_METADATA });
+    const id = stratum.addCatalog({ items: NR_CATALOG, ...CATALOG_METADATA }).id;
     const result = await stratum.publishFromCatalog(id, 'nrApiValid');
 
     expect(result).toBe(true);

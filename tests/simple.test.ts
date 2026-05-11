@@ -24,9 +24,7 @@ describe('load stratum without plugins', () => {
 
   describe('add base events', () => {
     it('should allow adding catalogs containing base events', async () => {
-      const id = stratum.addCatalog({ items: BASE_CATALOG });
-      expect(id).toBeDefined();
-      const catalog = stratum.catalogs[id];
+      const catalog = stratum.addCatalog({ items: BASE_CATALOG });
       expect(catalog).toBeDefined();
       expect(catalog.isValid).toBe(true);
       expect(Object.keys(catalog.validModels)).toStrictEqual(['1', '2']);
@@ -69,7 +67,7 @@ describe('load stratum without plugins', () => {
     let id = '';
 
     beforeEach(() => {
-      id = stratum.addCatalog({ items: BASE_CATALOG });
+      id = stratum.addCatalog({ items: BASE_CATALOG }).id;
     });
 
     it('should allow publishing  events', async () => {

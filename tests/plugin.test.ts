@@ -1,5 +1,5 @@
-import { StratumService } from '../src';
-import type { StratumSnapshot } from '../src/types';
+import { BasePlugin, Injector, StratumService } from '../src';
+import type { StratumSnapshot, PluginHooks } from '../src/types';
 import { PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
 import { enableDebugMode, getPublishers, restoreStratumMocks } from './utils/helpers';
 import {
@@ -97,7 +97,37 @@ describe('stratum base plugin functionality', () => {
       const pluginB = PluginBFactory({ pluginOptions });
       expect(onRegisterHookSpy).toHaveBeenCalledTimes(0);
       stratum.addPlugin(pluginB);
-      expect(onRegisterHookSpy).toHaveBeenCalledTimes(1);
+      expect(onRegisterHookSpy).toHaveBeenCalledWith(
+        expect.any(Injector),
+        expect.objectContaining({ addCatalog: expect.any(Function) })
+      );
+    });
+
+    it('should allow a plugin to register and publish from a catalog via hooks.addCatalog', async () => {
+      let publishRef: () => Promise<boolean>;
+
+      class HooksPlugin extends BasePlugin<never, never> {
+        name = 'hooks';
+        onRegister(_injector: Injector, hooks: PluginHooks) {
+          const catalog = hooks.addCatalog({
+            items: SAMPLE_A_CATALOG,
+            componentName: 'hooks-test'
+          });
+          publishRef = () => catalog.publish(1);
+        }
+      }
+
+      stratum.addPlugin(new HooksPlugin());
+
+      const listener = jest.fn();
+      const event = await new Promise<StratumSnapshot>((resolve) => {
+        listener.mockImplementation(resolve);
+        stratum.addSnapshotListener(listener);
+        publishRef();
+      });
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(event.event.id).toBe(1);
     });
   });
 

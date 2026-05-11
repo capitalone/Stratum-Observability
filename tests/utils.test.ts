@@ -14,7 +14,7 @@ import {
   addGlobalPlugin,
   removeGlobalPlugin
 } from '../src';
-import { INVALID_SAMPLE_CATALOG, SAMPLE_A_CATALOG } from './utils/catalog';
+import { INVALID_SAMPLE_CATALOG, SAMPLE_A_CATALOG, SAMPLE_A_CATALOG_2 } from './utils/catalog';
 import { CATALOG_METADATA, globalWindow, PRODUCT_NAME, PRODUCT_VERSION, SESSION_ID } from './utils/constants';
 import { enableDebugMode, isUuid, mockCrypto, restoreStratumMocks } from './utils/helpers';
 import { PluginAFactory, PluginA, PluginB, SamplePublisher } from './utils/sample-plugin';
@@ -77,22 +77,24 @@ describe('util functions', () => {
     describe('RegisteredStratumCatalog', () => {
       const id = 'catalog-id';
       let injector: Injector;
+      let publishFn: jest.Mock;
+      const options = { items: SAMPLE_A_CATALOG, ...CATALOG_METADATA };
 
       beforeEach(() => {
         injector = new Injector(PRODUCT_NAME, PRODUCT_VERSION);
         injector.registerPlugin(PluginAFactory());
+        publishFn = jest.fn();
       });
 
       it('should handle validating a stratum catalog on construction', () => {
-        const options = { items: SAMPLE_A_CATALOG, ...CATALOG_METADATA };
-        const catalog = new RegisteredStratumCatalog(id, options, injector);
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
         expect(catalog.id).toEqual(id);
         expect(catalog.isValid).toBe(true);
       });
 
       it('should show validation errors for invalid events', () => {
         const options = { items: INVALID_SAMPLE_CATALOG, ...CATALOG_METADATA };
-        const catalog = new RegisteredStratumCatalog(id, options, injector);
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
         expect(catalog.isValid).toBe(false);
         expect(Object.keys(catalog.validModels)).toHaveLength(1);
         expect(Object.keys(catalog.errors)).toHaveLength(4);
@@ -100,6 +102,36 @@ describe('util functions', () => {
         expect(catalog.errors[1].errors).toHaveLength(1);
         expect(catalog.errors[3].errors).toHaveLength(1);
         expect(catalog.errors['duplicate'].errors).toHaveLength(1);
+      });
+
+      it('should add new valid models via addItems at runtime', () => {
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
+        const initialCount = Object.keys(catalog.validModels).length;
+
+        catalog.addItems(SAMPLE_A_CATALOG_2);
+        expect(Object.keys(catalog.validModels)).toHaveLength(initialCount + 1);
+        expect(catalog.validModels.abc).toBeDefined();
+        expect(catalog.isValid).toBe(true);
+      });
+
+      it('should reject invalid items via addItems at runtime', () => {
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
+        const initialCount = Object.keys(catalog.validModels).length;
+        expect(catalog.isValid).toBe(true);
+
+        catalog.addItems(INVALID_SAMPLE_CATALOG);
+
+        expect(catalog.isValid).toBe(false);
+        expect(Object.keys(catalog.validModels)).toHaveLength(initialCount);
+        expect(Object.keys(catalog.errors)).toHaveLength(Object.keys(INVALID_SAMPLE_CATALOG).length);
+      });
+
+      it('should delegate publish to the provided publishFn', async () => {
+        publishFn.mockResolvedValue(true);
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
+        const result = await catalog.publish(1);
+        expect(result).toBe(true);
+        expect(publishFn).toHaveBeenCalledWith(id, 1, undefined);
       });
     });
   });

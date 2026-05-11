@@ -2,7 +2,7 @@ import { NewRelicEventType, NewRelicEvents } from '../../src/plugins/new-relic-p
 import { StratumCatalog } from '../../src/types';
 import { AEvent, BEvent, SampleEventType } from './sample-plugin';
 
-export const SAMPLE_A_CATALOG: StratumCatalog<AEvent> = {
+export const SAMPLE_A_CATALOG = {
   1: {
     eventType: SampleEventType.A,
     name: '{{PLACEHOLDER_2}}',
@@ -35,9 +35,9 @@ export const SAMPLE_A_CATALOG: StratumCatalog<AEvent> = {
     description: 'event 4',
     id: 8
   }
-};
+} satisfies StratumCatalog<AEvent>;
 
-export const SAMPLE_A_CATALOG_2: StratumCatalog<AEvent> = {
+export const SAMPLE_A_CATALOG_2 = {
   abc: {
     eventType: SampleEventType.A,
     name: 'abc',
@@ -46,9 +46,9 @@ export const SAMPLE_A_CATALOG_2: StratumCatalog<AEvent> = {
     description: 'event 3',
     id: 1000
   }
-};
+} satisfies StratumCatalog<AEvent>;
 
-export const SAMPLE_B_CATALOG: StratumCatalog<BEvent> = {
+export const SAMPLE_B_CATALOG = {
   1: {
     eventType: SampleEventType.B,
     prop3: true,
@@ -64,7 +64,7 @@ export const SAMPLE_B_CATALOG: StratumCatalog<BEvent> = {
     description: 'event 2',
     id: 1
   }
-};
+} satisfies StratumCatalog<BEvent>;
 
 export const INVALID_SAMPLE_CATALOG: any = {
   0: {},
@@ -91,7 +91,7 @@ export const INVALID_SAMPLE_CATALOG: any = {
   }
 };
 
-export const NR_CATALOG: StratumCatalog<NewRelicEvents> = {
+export const NR_CATALOG = {
   nrEventValid: {
     eventType: NewRelicEventType.EVENT,
     message: 'abc',
@@ -155,9 +155,9 @@ export const NR_CATALOG: StratumCatalog<NewRelicEvents> = {
     description: 'description',
     id: 105
   }
-};
+} satisfies StratumCatalog<NewRelicEvents>;
 
-export const BASE_CATALOG: StratumCatalog = {
+export const BASE_CATALOG = {
   1: {
     eventType: 'base',
     description: 'base event 1',
@@ -167,4 +167,4 @@ export const BASE_CATALOG: StratumCatalog = {
     eventType: 'base',
     description: 'base event 2'
   }
-};
+} satisfies StratumCatalog;

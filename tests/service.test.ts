@@ -4,7 +4,8 @@ import {
   RegisteredStratumCatalog,
   Logger,
   StratumService,
-  addGlobalPlugin
+  addGlobalPlugin,
+  StratumSnapshot
 } from '../src';
 import * as utils from '../src/utils/general';
 import { BrowserConsolePlugin, BrowserConsolePublisher } from '../src/plugins/browser-console';
@@ -75,7 +76,7 @@ describe('stratum service base functionality', () => {
       productVersion: PRODUCT_VERSION,
       plugins: [PluginAFactory()]
     });
-    const id = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
+    const id = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA }).id;
     const catalog = Object.values(stratum.catalogs)[0];
     expect(id).toEqual(METADATA_CATALOG_ID);
     expect(stratum.defaultCatalog).toBeUndefined();
@@ -172,27 +173,30 @@ describe('stratum service base functionality', () => {
     expect(stratum.publishers[1]).toBeInstanceOf(BrowserConsolePublisher);
   });
 
-  it('should return catalog id even for duplicate catalogs', () => {
+  it('should return an existing catalog and add items for duplicate catalog ids', () => {
     // Add a standard catalog
-    stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
+    const first = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
     expect(Object.keys(stratum.catalogs)).toHaveLength(2);
+    expect(Object.keys(first.validModels)).toHaveLength(catalog1Length);
 
     // Attempt to add another catalog with the same metadata
-    const id = stratum.addCatalog({ items: {}, ...CATALOG_METADATA });
-    expect(id).toBe(METADATA_CATALOG_ID);
+    const duplicate = stratum.addCatalog({ items: SAMPLE_A_CATALOG_2, ...CATALOG_METADATA });
+    expect(duplicate).toBe(first);
     expect(Object.keys(stratum.catalogs)).toHaveLength(2);
+    expect(first.validModels['abc']).toBeDefined();
+    expect(Object.keys(first.validModels)).toHaveLength(catalog1Length + 1);
 
     // Update the metadata
-    const result2 = stratum.addCatalog({
-      items: {},
+    const different = stratum.addCatalog({
+      items: SAMPLE_A_CATALOG_2,
       ...CATALOG_METADATA,
       catalogVersion: 'different'
     });
-    expect(result2).toBeDefined();
+    expect(different.isValid).toBe(true);
     expect(Object.keys(stratum.catalogs)).toHaveLength(3);
   });
 
-  it('should handle removing catalogs at run-time', () => {
+  it('should handle removing catalogs at run-time', async () => {
     stratum = new StratumService({
       catalog: { items: SAMPLE_A_CATALOG, catalogVersion: CATALOG_METADATA.catalogVersion },
       productName: PRODUCT_NAME,
@@ -200,7 +204,8 @@ describe('stratum service base functionality', () => {
       plugins: [PluginAFactory()]
     });
 
-    const id = stratum.addCatalog({ items: SAMPLE_A_CATALOG_2, ...CATALOG_METADATA }) as string;
+    const catalog = stratum.addCatalog({ items: SAMPLE_A_CATALOG_2, ...CATALOG_METADATA });
+    const id = catalog.id;
     const defaultId = stratum.defaultCatalog?.id as string;
 
     expect(id).toBe(METADATA_CATALOG_ID);
@@ -218,13 +223,53 @@ describe('stratum service base functionality', () => {
     expect(stratum.defaultCatalog).toBeUndefined();
     expect(stratum.injector.registeredEventIds[defaultId]).toBeUndefined();
 
+    expect(await catalog.publish('abc')).toBe(true);
     stratum.removeCatalog(id);
 
     expect(Object.keys(stratum.catalogs)).toHaveLength(0);
     expect(Object.keys(stratum.injector.registeredEventIds)).toHaveLength(0);
+    expect(await catalog.publish('abc')).toBe(false);
   });
 
-  describe('publish unhappy paths', () => {
+  describe('direct catalog publishing', () => {
+    it('should publish an event via catalog.publish and fire the snapshot listener', async () => {
+      const catalog = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
+      const listener = jest.fn();
+
+      const snapshot = await new Promise<StratumSnapshot>((resolve) => {
+        listener.mockImplementation(resolve);
+        stratum.addSnapshotListener(listener);
+        catalog.publish(1);
+      });
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(snapshot.catalog.id).toEqual(METADATA_CATALOG_ID);
+      expect(snapshot.event.key).toBe('1');
+    });
+
+    it('should return false when publishing an invalid key', async () => {
+      const catalog = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
+      const result = await catalog.publish('noop' as unknown as 1);
+      expect(result).toBe(false);
+    });
+
+    it('should allow publishing new keys after addItems at runtime', async () => {
+      const catalog = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
+      const listener = jest.fn();
+      const newCatalog = catalog.addItems(SAMPLE_A_CATALOG_2);
+
+      const snapshot = await new Promise<StratumSnapshot>((resolve) => {
+        listener.mockImplementation(resolve);
+        stratum.addSnapshotListener(listener);
+        newCatalog.publish('abc');
+      });
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(snapshot.event.key).toBe('abc');
+    });
+  });
+
+  describe('service publish unhappy paths', () => {
     it('should fail to publish an event if a default catalog is not found', async () => {
       const warnSpy = jest.spyOn(Logger.prototype, 'debug');
       stratum = new StratumService({ productName: PRODUCT_NAME, productVersion: PRODUCT_VERSION });

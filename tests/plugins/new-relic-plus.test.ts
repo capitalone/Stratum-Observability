@@ -244,7 +244,7 @@ describe('NewRelicPlusPublisher', () => {
       stratum.addPlugin(PluginAFactory());
       nrpPlugin.setContext('myCustomVar', 'test1');
       nrpPlugin.setContext('myCustomVar2', 'test2');
-      const id = stratum.addCatalog({ items: SAMPLE_A_CATALOG, componentName: 'noop' });
+      const id = stratum.addCatalog({ items: SAMPLE_A_CATALOG, componentName: 'noop' }).id;
       await stratum.publishFromCatalog(id, 1);
       const attributes = Object.fromEntries(setAttributeSpy.mock.calls);
       expect(attributes.stratum_myCustomVar).toBe('test1');
