@@ -108,11 +108,10 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent, K e
    * and validModels if a catalog item failed initially and another item with
    * the same key was added over the catalog creation.
    *
-   * @param {StratumCatalog<T, K>} items Incoming catalog items
-   * @return {boolean} Flag indicating whether all items passed validation or
-   *   at least item failed validation
+   * @param {StratumCatalog<T, Y>} items Incoming catalog items
+   * @return {RegisteredStratumCatalog<T, K | Y} The same catalog instance with a widened keyset
    */
-  addItems(items: StratumCatalog<T, K>): boolean {
+  addItems<Y extends CatalogKey>(items: StratumCatalog<T, Y>): RegisteredStratumCatalog<T, K | Y> {
     let isCatalogValid = true;
     for (const [key, item] of Object.entries(items)) {
       const errors = [];
@@ -143,7 +142,7 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent, K e
       }
     }
     this.isValid = this.isValid && isCatalogValid;
-    return isCatalogValid;
+    return this;
   }
 
   /**
