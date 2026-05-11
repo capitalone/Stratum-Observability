@@ -38,7 +38,7 @@
     "build": "npm run build:clean && npm run build:lib",
     "build:analyze": "node scripts/analyze.mjs",
     "build:clean": "rimraf dist",
-    "build:lib": "rollup -c --bundleConfigAsCjs",
+    "build:lib": "rollup -c",
     "build:watch": "npm run build:clean && npm run build:lib -- --watch",
     "ci:pipeline": "npm ci --ignore-scripts",
     "lint": "biome check --fix --no-errors-on-unmatched --error-on-warnings",

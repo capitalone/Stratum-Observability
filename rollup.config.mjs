@@ -1,7 +1,7 @@
 import { readdirSync, statSync } from 'node:fs';
 import replace from '@rollup/plugin-replace';
 import typescript from 'rollup-plugin-typescript2';
-import pkg from './package.json';
+import pkg from './package.json' with { type: 'json' };
 
 const pluginPath = 'src/plugins';
 const getPlugins = () => readdirSync(pluginPath).filter((f) => statSync(`${pluginPath}/${f}`).isDirectory());
