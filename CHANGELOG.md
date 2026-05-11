@@ -10,5 +10,5 @@
 
 ### Changed
 
-- **Breaking:** `addCatalog()` returns a `RegisteredStratumCatalog` instance instead of a catalog ID string
-- Duplicate catalog IDs now merge items into the existing catalog instead of rejecting
+1. **Breaking:** `addCatalog()` returns a `RegisteredStratumCatalog` instance instead of a catalog ID string
+2. Duplicate catalog IDs now merge items into the existing catalog instead of rejecting
