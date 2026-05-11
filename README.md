@@ -173,14 +173,18 @@ interface SimpleEvent extends StratumEvent<SimpleEventType> {
  * be defined.
  * 
  * If you do not provide your custom event type interface as a generic
- * to the StratumCatalog type, ype-hinting for required properties
+ * to the StratumCatalog type, type-hinting for required properties
  * will not be available. 
  * 
  * Multiple custom event type interfaces can be added as a union:
  * `StratumCatalog<SimpleEvent | ComplexEvent>`
+ * 
+ * Note: Use `satisfies` instead of a type annotation `:` to preserve
+ * literal key types for run-time catalogs published with type-hinting.
+ * 
  */
-const catalog: StratumCatalog<SimpleEvent> = {
-  {
+const catalog = {
+  'my-event': {
     eventType: SimpleEventType,
 
     // Implement the required base properties required by Stratum
@@ -190,8 +194,13 @@ const catalog: StratumCatalog<SimpleEvent> = {
     // Additional fields defined by SimpleEvent
     simpleValue: 12345
   }
-}
+} satisfies StratumCatalog<SimpleEvent>;
 ```
+
+#### Type-safe keys with `satisfies`
+Using `satisfies StratumCatalog<T>` instead of `: StratumCatalog<T>` preserves literal key types. This enables compile-time key checking when publishing via `catalog.publish()` from `RegistereStratumCatalog` instance (via `addCatalog()`).
+
+Note: type-safe keys only apply to catalog-level publishing. Publishing through the servie (`stratum.publish(key)`) does not support compile-type key checking.
 
 ### Event models
 ```javascript
