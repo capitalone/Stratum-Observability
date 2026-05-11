@@ -1,13 +1,13 @@
-import { DEBUG_KEY, STORED_SESSION_ID_KEY, StratumService, GLOBAL_LISTENER_KEY } from '../../src';
 import { webcrypto } from 'node:crypto';
+import { DEBUG_KEY, GLOBAL_LISTENER_KEY, STORED_SESSION_ID_KEY, type StratumService } from '../../src';
 import { globalWindow, SESSION_ID } from './constants';
 
 export function getPublishers(service: StratumService) {
-  return Object.values(service['publishers']);
+  return Object.values(service.publishers);
 }
 
 export function enableDebugMode(value: boolean) {
-  sessionStorage.setItem(DEBUG_KEY, '' + value);
+  sessionStorage.setItem(DEBUG_KEY, `${value}`);
 }
 
 export function isUuid(uuid: string) {
@@ -43,8 +43,7 @@ export function restoreStratumMocks() {
   localStorage.clear();
   sessionStorage.clear();
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  delete (globalThis as any).crypto;
+  delete globalWindow.crypto;
 }
 
 export function removeAllPublishers(stratum: StratumService) {

@@ -1,4 +1,4 @@
-import { BasePublisher } from './base';
+import type { BasePublisher } from './base';
 import type {
   AbTest,
   AbTestSchema,
@@ -200,7 +200,7 @@ export class StratumService {
     options?: Partial<UserDefinedEventOptions>
   ): Promise<boolean> {
     const catalog = this.catalogs[catalogId];
-    if (!catalog || !catalog.validModels[key]) {
+    if (!catalog?.validModels[key]) {
       this.injector.logger.debug(`Unable to publish "${key}": key not found or invalid`);
       return Promise.resolve(false);
     }

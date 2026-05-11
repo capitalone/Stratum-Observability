@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.1
+
+### Changed
+
+1. Integrates BiomeJS and removes Prettier/Eslint/Lintstaged
+
 ## v2.0.0
 
 ### Added

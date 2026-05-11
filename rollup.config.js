@@ -1,10 +1,10 @@
-import { readdirSync, statSync } from 'fs';
-import typescript from 'rollup-plugin-typescript2';
+import { readdirSync, statSync } from 'node:fs';
 import replace from '@rollup/plugin-replace';
-import pkg from './package.json' assert { type: 'json' };
+import typescript from 'rollup-plugin-typescript2';
+import pkg from './package.json';
 
 const pluginPath = 'src/plugins';
-const getPlugins = () => readdirSync(pluginPath).filter((f) => statSync(pluginPath + '/' + f).isDirectory());
+const getPlugins = () => readdirSync(pluginPath).filter((f) => statSync(`${pluginPath}/${f}`).isDirectory());
 
 export default {
   input: ['src/index.ts', ...getPlugins().map((p) => `${pluginPath}/${p}/index.ts`)],

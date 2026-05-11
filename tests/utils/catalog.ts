@@ -1,6 +1,6 @@
-import { NewRelicEventType, NewRelicEvents } from '../../src/plugins/new-relic-plus';
-import { StratumCatalog } from '../../src/types';
-import { AEvent, BEvent, SampleEventType } from './sample-plugin';
+import { type NewRelicEvents, NewRelicEventType } from '../../src/plugins/new-relic-plus';
+import type { StratumCatalog } from '../../src/types';
+import { type AEvent, type BEvent, SampleEventType } from './sample-plugin';
 
 export const SAMPLE_A_CATALOG = {
   1: {
@@ -66,7 +66,7 @@ export const SAMPLE_B_CATALOG = {
   }
 } satisfies StratumCatalog<BEvent>;
 
-export const INVALID_SAMPLE_CATALOG: any = {
+export const INVALID_SAMPLE_CATALOG = {
   0: {},
   1: {
     eventType: SampleEventType.A,
@@ -117,6 +117,7 @@ export const NR_CATALOG = {
     description: 'description',
     id: 102
   },
+  // @ts-expect-error testing runtime handling with invalid types
   nrApiInvalid: {
     eventType: NewRelicEventType.API_RESPONSE,
     name: 'nrapiresponse',
@@ -124,7 +125,7 @@ export const NR_CATALOG = {
     statusText: '',
     description: 'description',
     id: 103
-  } as any,
+  },
   nrErrorValid: {
     errorCode: 'myerrorcode',
     errorText: 'errortext',
@@ -137,12 +138,13 @@ export const NR_CATALOG = {
     description: 'description',
     id: 104
   },
+  // @ts-expect-error testing runtime handling with invalid types
   nrErrorInvalid: {
     eventType: NewRelicEventType.ERROR,
     name: 'nrerror',
     description: 'description',
     id: 104 // Intentional repeat of already-in-use id
-  } as any,
+  },
   nrApiPlaceholders: {
     eventType: NewRelicEventType.API_RESPONSE,
     message: '{{PLACEHOLDER_1}}',

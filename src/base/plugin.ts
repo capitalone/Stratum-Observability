@@ -1,7 +1,7 @@
-import { PluginContext, PluginHooks, PluginOptions } from '../types';
-import { Injector } from '../utils';
-import { BaseEventModel } from './model';
-import { BasePublisher } from './publisher';
+import type { PluginContext, PluginHooks, PluginOptions } from '../types';
+import type { Injector } from '../utils';
+import type { BaseEventModel } from './model';
+import type { BasePublisher } from './publisher';
 
 /**
  * A plugin is composed of one or more custom event models and
@@ -42,7 +42,7 @@ export abstract class BasePlugin<T extends PluginContext, U extends PluginOption
    * will be registered in Stratum as a SimpleEventModel
    * instance.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   eventTypes?: { [key: string]: typeof BaseEventModel<any> };
 
   /**
@@ -119,7 +119,6 @@ export abstract class BasePlugin<T extends PluginContext, U extends PluginOption
    * @property {Injector} injector - Stratum service injector instance
    * @property {PluginHooks} hooks - Scoped service capabilities
    */
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   onRegister(_injector: Injector, _hooks: PluginHooks) {
     // Do nothing by default
   }

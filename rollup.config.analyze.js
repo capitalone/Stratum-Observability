@@ -1,9 +1,9 @@
-import { readdirSync, statSync } from 'fs';
-import typescript from 'rollup-plugin-typescript2';
+import { readdirSync, statSync } from 'node:fs';
 import terser from '@rollup/plugin-terser';
+import typescript from 'rollup-plugin-typescript2';
 
 const pluginPath = 'src/plugins';
-const getPlugins = () => readdirSync(pluginPath).filter((f) => statSync(pluginPath + '/' + f).isDirectory());
+const getPlugins = () => readdirSync(pluginPath).filter((f) => statSync(`${pluginPath}/${f}`).isDirectory());
 const buildConfig = (name, input) => ({
   input,
   output: [

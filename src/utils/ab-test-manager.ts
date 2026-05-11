@@ -18,7 +18,7 @@ export class AbTestManager {
    * Called when new instance is created.
    */
   private static _generateUniqueKey() {
-    return 't' + AbTestManager.n++;
+    return `t${AbTestManager.n++}`;
   }
 
   /**

@@ -1,8 +1,8 @@
-import { BaseEventModel, BasePublisher } from '../../base';
+import { type BaseEventModel, BasePublisher } from '../../base';
 import type { StratumSnapshot } from '../../types';
 import { isDefined } from '../../utils/general';
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 type NrSpaInteraction = any;
 
 /**
@@ -52,7 +52,7 @@ export class NewRelicPublisher extends BasePublisher {
    */
   protected get publisher() {
     if (typeof window !== 'undefined') {
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      // biome-ignore lint/suspicious/noExplicitAny: legacy support
       return (window as any).newrelic;
     }
     return undefined;
@@ -130,7 +130,7 @@ export class NewRelicPublisher extends BasePublisher {
    * related attributes and save BrowserInteraction event to
    * New Relic based off the default New Relic event.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   async publish(content: any, snapshot: StratumSnapshot) {
     const interaction = this.getDefaultInteraction(snapshot);
     const isValid = isDefined(snapshot?.eventOptions?.data?.isValid)

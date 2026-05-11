@@ -18,7 +18,7 @@ export interface StratumSnapshot {
     id: string;
     metadata: CatalogMetadata;
   };
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   data: any;
 
   /**
@@ -32,7 +32,7 @@ export interface StratumSnapshot {
    */
   globalContext: {
     [pluginName: string]: {
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      // biome-ignore lint/suspicious/noExplicitAny: legacy support
       [key: string]: any;
     };
   };

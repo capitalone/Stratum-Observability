@@ -77,18 +77,12 @@ npm run build:watch
 
 ### 4. Code quality & maintenance
 #### lint
-Run code quality checks and attempt to fix any violations. This script is automatically run as part of a pre-commit hook. You will not likely need to run this manually.
+Run code quality checks via BiomeJS and attempt to fix any violations. The repo workflow will check if lint rules are satisfied as part of a pre-commit hook and on PR build. Run the following script and resolve any open findings that cannot be applied automatically.
 
 ```
 npm run lint
 ```
 
-#### prettier
-Update code to conform to repository code style rules. This script is automatically run as part of a pre-commit hook. You will not likely need to run this manually.
-
-```
-npm run prettier
-```
 
 ### 5. Unit tests
 Unit tests are run via Jest.

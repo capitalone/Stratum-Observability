@@ -1,4 +1,4 @@
-import { BaseEventModel } from '../base';
+import type { BaseEventModel } from '../base';
 import type {
   CatalogErrors,
   CatalogEvent,
@@ -9,7 +9,7 @@ import type {
   UserDefinedCatalogOptions,
   UserDefinedEventOptions
 } from '../types';
-import { Injector } from './injector';
+import type { Injector } from './injector';
 
 /**
  * Instance of a registered stratum catalog. Takes in user-defined
@@ -206,7 +206,7 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent, K e
  * @return {string} Generated catalog id
  */
 export function generateCatalogId(
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   options: UserDefinedCatalogOptions<any>,
   productName: string,
   productVersion: string

@@ -10,7 +10,7 @@ import { isDefined } from './general';
  *
  * @return {boolean} Returns whether the attempt to set the provided function was successful
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 function _instantiateStratumSnapshotListener(key: string, fn: StratumSnapshotListenerFn, host?: any): boolean {
   try {
     if (!isDefined(host)) {
@@ -41,7 +41,7 @@ function _instantiateStratumSnapshotListener(key: string, fn: StratumSnapshotLis
  *
  * @return {boolean} Returns whether the attempt to set the provided function was successful
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export function addStratumSnapshotListener(id: string, fn: StratumSnapshotListenerFn, host?: any): boolean {
   return _instantiateStratumSnapshotListener(`stratum_config_${id}`, fn, host);
 }
@@ -58,7 +58,7 @@ export function addStratumSnapshotListener(id: string, fn: StratumSnapshotListen
  *
  * @return {boolean} Returns whether the attempt to set the provided function was successful
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export function addGlobalStratumSnapshotListener(fn: StratumSnapshotListenerFn, host?: any): boolean {
   return _instantiateStratumSnapshotListener(GLOBAL_LISTENER_KEY, fn, host);
 }

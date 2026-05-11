@@ -3,7 +3,7 @@ import type { BasePlugin } from '../base';
 /**
  * Helper type to specify a base plugin of any type
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export type GenericPlugin = BasePlugin<any, any>;
 
 /**
@@ -11,7 +11,7 @@ export type GenericPlugin = BasePlugin<any, any>;
  * can provide child definitions of this type to
  * define specific option keys.
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export type PluginOptions = Record<string, any>;
 
 /**
@@ -24,7 +24,7 @@ export type PluginOptions = Record<string, any>;
  * By default, any keys that are not initially provided within
  * the BasePlugin class will fail validation.
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export type PluginContext = Record<string, any>;
 
 /**

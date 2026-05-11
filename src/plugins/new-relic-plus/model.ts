@@ -1,6 +1,6 @@
 import { BaseEventModel } from '../../base';
-import { EventOptions } from '../../types';
-import { NewRelicApiResponseEvent, NewRelicErrorEvent, NewRelicEvent } from './types';
+import type { EventOptions } from '../../types';
+import type { NewRelicApiResponseEvent, NewRelicErrorEvent, NewRelicEvent } from './types';
 
 /**
  * Wrapper class for the NewRelicEvent interface.
@@ -16,7 +16,7 @@ export class NewRelicEventModel<T extends NewRelicEvent<string> = NewRelicEvent>
    * Use this value on the source to explicitly define which fields to
    * send to New Relic via NewRelicPlusPublisher.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   protected processedNewRelicData: any;
 
   protected checkValidity(): boolean {
@@ -35,7 +35,7 @@ export class NewRelicEventModel<T extends NewRelicEvent<string> = NewRelicEvent>
       featureName: this.processedNewRelicData.featureName,
       message: this.processedNewRelicData.message,
       name: this.processedNewRelicData.name,
-      id: '' + this.processedNewRelicData.id
+      id: `${this.processedNewRelicData.id}`
     };
   }
 }

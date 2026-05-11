@@ -1,5 +1,6 @@
 import { BasePlugin, Injector, StratumService } from '../src';
-import type { StratumSnapshot, PluginHooks } from '../src/types';
+import type { PluginHooks, StratumSnapshot } from '../src/types';
+import { SAMPLE_A_CATALOG } from './utils/catalog';
 import { PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
 import { enableDebugMode, getPublishers, restoreStratumMocks } from './utils/helpers';
 import {
@@ -7,13 +8,12 @@ import {
   EmptyModel,
   PLUGIN_A_NAME,
   PLUGIN_B_NAME,
-  PluginA,
+  type PluginA,
   PluginAFactory,
   PluginB,
   PluginBFactory,
-  PluginBOptions
+  type PluginBOptions
 } from './utils/sample-plugin';
-import { SAMPLE_A_CATALOG } from './utils/catalog';
 
 describe('stratum base plugin functionality', () => {
   let stratum: StratumService;
@@ -77,10 +77,15 @@ describe('stratum base plugin functionality', () => {
     });
 
     it('should handle setting invalid context vars', () => {
-      expect(pluginA.getContext('var3' as any)).toBeUndefined();
-      const result = pluginA.setContext('var3' as any, '456');
+      // @ts-expect-error testing runtime handling with invalid types
+      expect(pluginA.getContext('var3')).toBeUndefined();
+
+      // @ts-expect-error testing runtime handling with invalid types
+      const result = pluginA.setContext('var3', '456');
       expect(result).toBe(false);
-      expect(pluginA.getContext('var3' as any)).toBeUndefined();
+
+      // @ts-expect-error testing runtime handling with invalid types
+      expect(pluginA.getContext('var3')).toBeUndefined();
     });
   });
 
