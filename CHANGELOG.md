@@ -1,11 +1,5 @@
 # Changelog
 
-## v2.0.1
-
-### Changed
-
-1. Integrates BiomeJS and removes Prettier/Eslint/Lintstaged
-
 ## v2.0.0
 
 ### Added
@@ -18,3 +12,4 @@
 
 1. **Breaking:** `addCatalog()` returns a `RegisteredStratumCatalog` instance instead of a catalog ID string
 2. Duplicate catalog IDs now merge items into the existing catalog instead of rejecting
+3. Integrates BiomeJS and removes Prettier/Eslint/Lintstaged
