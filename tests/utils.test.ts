@@ -133,6 +133,52 @@ describe('util functions', () => {
         expect(result).toBe(true);
         expect(publishFn).toHaveBeenCalledWith(id, 1, undefined);
       });
+
+      it('should add new valid models via addItems at runtime', () => {
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
+        const initialCount = Object.keys(catalog.validModels).length;
+
+        catalog.addItems(SAMPLE_A_CATALOG_2);
+
+        expect(Object.keys(catalog.validModels)).toHaveLength(initialCount + 1);
+        expect(catalog.validModels.abc).toBeDefined();
+        expect(catalog.isValid).toBe(true);
+      });
+
+      it('should reject invalid items via addItems at runtime', () => {
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
+        const initialCount = Object.keys(catalog.validModels).length;
+        expect(catalog.isValid).toBe(true);
+
+        // @ts-expect-error testing runtime handling with invalid types
+        catalog.addItems(INVALID_SAMPLE_CATALOG);
+
+        expect(catalog.isValid).toBe(false);
+        expect(Object.keys(catalog.validModels)).toHaveLength(initialCount);
+        expect(Object.keys(catalog.errors)).toHaveLength(Object.keys(INVALID_SAMPLE_CATALOG).length);
+      });
+
+      it('should recover isValid when failed keys are re-added successfully', () => {
+        const invalidItems = { 1: INVALID_SAMPLE_CATALOG[1] };
+        const options = { items: invalidItems, ...CATALOG_METADATA };
+        // @ts-expect-error testing runtime handling with invalid types
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
+
+        expect(catalog.isValid).toBe(false);
+
+        catalog.addItems(SAMPLE_A_CATALOG);
+
+        expect(catalog.isValid).toBe(true);
+        expect(Object.keys(catalog.errors)).toHaveLength(0);
+      });
+
+      it('should delegate publish to the provided publishFn', async () => {
+        publishFn.mockResolvedValue(true);
+        const catalog = new RegisteredStratumCatalog(id, options, injector, publishFn);
+        const result = await catalog.publish(1);
+        expect(result).toBe(true);
+        expect(publishFn).toHaveBeenCalledWith(id, 1, undefined);
+      });
     });
   });
 

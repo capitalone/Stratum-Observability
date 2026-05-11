@@ -105,7 +105,7 @@ export class StratumService {
    * Note: catalog item ids do not need to be unique across catalogs.
    *
    * @param {UserDefinedCatalogOptions<T, K>} options - Catalog items and optional catalog version
-   * @return {RegisteredStratumCatalog<T, K>} Catalog id of newly registered catalog
+   * @return {RegisteredStratumCatalog<T, K>} The registered catalog instance
    */
   addCatalog<T extends CatalogEvent = CatalogEvent, K extends CatalogKey = CatalogKey>(
     options: UserDefinedCatalogOptions<T, K>
