@@ -1,6 +1,6 @@
 {
   "name": "@capitalone/stratum-observability",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Library for defining and publishing observability events through plugin-based architecture",
   "license": "Apache-2.0",
   "repository": {
@@ -45,6 +45,7 @@
     "lint:check": "biome check --no-errors-on-unmatched --error-on-warnings",
     "pre-commit": "npm run lint:check -- --staged",
     "prepare": "husky",
+    "prepublishOnly": "npm run build",
     "test": "jest --coverage=false",
     "test:coverage": "jest"
   },
