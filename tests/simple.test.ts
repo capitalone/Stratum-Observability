@@ -1,9 +1,9 @@
-import { StratumSnapshot, StratumService } from '../src';
-import { PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
-import { enableDebugMode, mockSessionId, restoreStratumMocks } from './utils/helpers';
-import { BASE_CATALOG } from './utils/catalog';
-import { BASE_EVENT_MOCK } from './utils/fixtures';
+import { StratumService, type StratumSnapshot } from '../src';
 import { BrowserConsolePlugin } from '../src/plugins/browser-console';
+import { BASE_CATALOG } from './utils/catalog';
+import { PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
+import { BASE_EVENT_MOCK } from './utils/fixtures';
+import { enableDebugMode, mockSessionId, restoreStratumMocks } from './utils/helpers';
 
 describe('load stratum without plugins', () => {
   let stratum: StratumService;

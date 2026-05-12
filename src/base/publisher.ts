@@ -1,6 +1,6 @@
 import type { StratumSnapshot } from '../types';
-import { Injector } from '../utils/injector';
-import { BaseEventModel } from './model';
+import type { Injector } from '../utils/injector';
+import type { BaseEventModel } from './model';
 
 /**
  * Base publisher class. All publishers should extend this class
@@ -9,7 +9,7 @@ import { BaseEventModel } from './model';
  * The associated generic type should reference the mapped output of the
  * models `getModelOutput`.
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export abstract class BasePublisher<T = any> {
   /**
    * Human-readable name of the publisher class. Used by debug
@@ -33,14 +33,13 @@ export abstract class BasePublisher<T = any> {
    * To accept all event types, do not override
    * this variable on child instances.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   acceptedEventModels?: (typeof BaseEventModel<any>)[];
 
   /**
    * Placeholder hook to perform some actions once the publisher instance is
    * received and registered by a StratumService.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   onInitialize(_injector: Injector) {
     // Do nothing by default
   }

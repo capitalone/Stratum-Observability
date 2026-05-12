@@ -73,4 +73,4 @@ jobs:
         run: npm run ci:pipeline
 
       - name: Lint code
-        run: npm run prettier:check && npm run lint:check
+        run: npm run lint:check

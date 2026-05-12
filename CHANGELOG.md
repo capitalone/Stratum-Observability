@@ -12,3 +12,9 @@
 
 1. **Breaking:** `addCatalog()` returns a `RegisteredStratumCatalog` instance instead of a catalog ID string
 2. Duplicate catalog IDs now merge items into the existing catalog instead of rejecting
+3. Integrates BiomeJS and resolves open findings
+
+### Removed
+1. Remove `prettier`, `eslint`, `lint-staged` and related devDependencies
+2. Convert ci scripts to ESM
+3. Remove `semver` and `shelljs` devDependencies

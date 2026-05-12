@@ -1,4 +1,4 @@
-import { BaseEventModel, BasePublisher } from '../base';
+import { BaseEventModel, type BasePublisher } from '../base';
 import { GLOBAL_LISTENER_KEY } from '../constants';
 import type { EventId, EventTypeModelMap, GenericPlugin, RegisteredPlugins, StratumSnapshotListenerFn } from '../types';
 import { AbTestManager } from './ab-test-manager';
@@ -173,7 +173,7 @@ export class Injector {
    * available globally for all Stratum instances to execute.
    */
   getExternalSnapshotListeners(): StratumSnapshotListenerFn[] {
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    // biome-ignore lint/suspicious/noExplicitAny: legacy support
     const g = globalThis as any;
     const scopedKey = `stratum_config_${this.productName}`;
     return [

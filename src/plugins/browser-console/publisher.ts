@@ -1,5 +1,5 @@
-import { BaseEventModel, BasePublisher } from '../../base';
-import { StratumSnapshot } from '../../types';
+import { type BaseEventModel, BasePublisher } from '../../base';
+import type { StratumSnapshot } from '../../types';
 
 /**
  * Browser Console Publisher
@@ -43,7 +43,6 @@ export class BrowserConsolePublisher extends BasePublisher {
    *
    * In this, case we publish the stringified event data to the console.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   async publish(content: string): Promise<void> {
     console.log(`BrowserConsolePlugin: ${content}`);
   }

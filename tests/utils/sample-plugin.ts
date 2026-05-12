@@ -1,5 +1,5 @@
-import { BasePlugin, BasePublisher, BaseEventModel } from '../../src';
-import type { PluginFactory, PluginFactoryWithRequiredOptions, StratumSnapshot, CatalogEvent } from '../../src/types';
+import { BaseEventModel, BasePlugin, BasePublisher } from '../../src';
+import type { CatalogEvent, PluginFactory, PluginFactoryWithRequiredOptions, StratumSnapshot } from '../../src/types';
 
 /**
  * Constants & types
@@ -77,7 +77,7 @@ export class SamplePublisher extends BasePublisher {
     return this.name;
   }
 
-  async publish(content: any, event: StratumSnapshot) {
+  async publish(content: unknown, event: StratumSnapshot) {
     samplePublisherSdk(event, content);
   }
 }

@@ -204,7 +204,7 @@ export interface EventOptions {
    * It's a good idea to validate the incoming data within your publisher
    * before using it.
    */
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   pluginData: { [key: string]: any };
 
   /**
@@ -213,7 +213,7 @@ export interface EventOptions {
    * This is a special derived field that is populated when sending data to publishers
    * sourced from the plugin name specified in `pluginData`
    */
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   data: any;
 }
 

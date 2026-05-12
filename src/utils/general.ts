@@ -9,13 +9,13 @@ export function isDefined<T>(val: T | undefined | null): val is T {
 }
 
 /**
- * Function to determine if given input is an Object
+ * Function to determine if given input is a record
+ * of string keys
  *
- * @param {unknown} item - Value to check if is object
- * @return {item is Object}
+ * @param {unknown} item - Value to check
+ * @return {item is Record<string, unknown>}
  */
-/* eslint-disable-next-line @typescript-eslint/ban-types */
-export function isObject(item: unknown): item is Object {
+export function isRecord(item: unknown): item is Record<string, unknown> {
   return isDefined(item) && typeof item === 'object' && !Array.isArray(item);
 }
 
@@ -38,10 +38,10 @@ export function normalizeToArray<T>(input: T[] | T | undefined): T[] {
  * while accounting for circular dependencies and
  * function object values.
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export function safeStringify(obj: any): string {
   const seen = new WeakSet();
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   const replacer = (_key: string, value: any) => {
     if (!(value !== null && typeof value === 'object')) {
       return value;
@@ -50,7 +50,7 @@ export function safeStringify(obj: any): string {
       return '[Circular]';
     }
     seen.add(value);
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    // biome-ignore lint/suspicious/noExplicitAny: legacy support
     const newValue: any = Array.isArray(value) ? [] : {};
     for (const [key2, value2] of Object.entries(value)) {
       newValue[key2] = replacer(key2, value2);

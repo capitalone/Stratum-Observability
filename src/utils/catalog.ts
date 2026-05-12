@@ -1,4 +1,4 @@
-import { BaseEventModel } from '../base';
+import type { BaseEventModel } from '../base';
 import type {
   CatalogErrors,
   CatalogEvent,
@@ -9,7 +9,7 @@ import type {
   UserDefinedCatalogOptions,
   UserDefinedEventOptions
 } from '../types';
-import { Injector } from './injector';
+import type { Injector } from './injector';
 
 /**
  * Instance of a registered stratum catalog. Takes in user-defined
@@ -113,35 +113,56 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent, K e
    */
   addItems<Y extends CatalogKey>(items: StratumCatalog<T, Y>): RegisteredStratumCatalog<T, K | Y> {
     for (const [key, item] of Object.entries(items)) {
-      const errors = [];
-      if (key in this.validModels) {
-        errors.push('Duplicate key');
+      const result = this.validateItem(key, item as T);
+      if ('model' in result) {
+        this.validModels[key] = result.model;
+        this.injector.registerEventId(this.id, result.model.id);
+        delete this.errors[key];
       } else {
-        const model = this.getEventModel(key, item as T);
-        if (typeof model === 'string') {
-          errors.push(model);
-        } else {
-          if (model.isValid) {
-            this.validModels[key] = model;
-            this.injector.registerEventId(this.id, model.id);
-            delete this.errors[key];
-          } else {
-            errors.push(...model.validationErrors);
-          }
-        }
-      }
-      if (errors.length) {
-        if (key in this.errors) {
-          this.errors[key].errors.push(...errors);
-        } else {
-          this.errors[key] = {
-            errors
-          };
-        }
+        this.recordErrors(key, result.errors);
       }
     }
+
     this.isValid = Object.keys(this.errors).length === 0;
     return this;
+  }
+
+  /**
+   * Private utility that loads the event model for a given catalog item. Based on the
+   * validation results of the model instance, either returns a reference to the model
+   * or the resulting validation error messages.
+   *
+   * @param {string} key - Catalog item key
+   * @param {T} key - Catalog item
+   * @return An object containing a model reference (success) or an array of error strings (failure)
+   */
+  private validateItem(key: string, item: T): { model: BaseEventModel<T> } | { errors: string[] } {
+    if (key in this.validModels) {
+      return { errors: ['Duplicate key'] };
+    }
+    const result = this.getEventModel(key, item);
+    if (typeof result === 'string') {
+      return { errors: [result] };
+    }
+    if (!result.isValid) {
+      return { errors: result.validationErrors };
+    }
+    return { model: result };
+  }
+
+  /**
+   * Private utility to create or append error messages by catalog
+   * item key.
+   *
+   * @param {string} key - Catalog item key
+   * @param {string[]} errors - Error messsages
+   */
+  private recordErrors(key: string, errors: string[]) {
+    if (key in this.errors) {
+      this.errors[key].errors.push(...errors);
+    } else {
+      this.errors[key] = { errors };
+    }
   }
 
   /**
@@ -205,7 +226,7 @@ export class RegisteredStratumCatalog<T extends CatalogEvent = CatalogEvent, K e
  * @return {string} Generated catalog id
  */
 export function generateCatalogId(
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  // biome-ignore lint/suspicious/noExplicitAny: legacy support
   options: UserDefinedCatalogOptions<any>,
   productName: string,
   productVersion: string

@@ -1,27 +1,27 @@
 import {
-  STORED_SESSION_ID_KEY,
-  addGlobalStratumSnapshotListener,
-  RegisteredStratumCatalog,
-  Logger,
-  StratumService,
   addGlobalPlugin,
-  StratumSnapshot
+  addGlobalStratumSnapshotListener,
+  Logger,
+  type RegisteredStratumCatalog,
+  STORED_SESSION_ID_KEY,
+  StratumService,
+  type StratumSnapshot
 } from '../src';
-import * as utils from '../src/utils/general';
 import { BrowserConsolePlugin, BrowserConsolePublisher } from '../src/plugins/browser-console';
-import { enableDebugMode, getPublishers, mockCrypto, restoreStratumMocks } from './utils/helpers';
+import * as utils from '../src/utils/general';
+import { SAMPLE_A_CATALOG, SAMPLE_A_CATALOG_2 } from './utils/catalog';
 import {
   AB_TEST_SCHEMA,
-  METADATA_CATALOG_ID,
   CATALOG_METADATA,
-  PRODUCT_NAME,
-  PRODUCT_VERSION,
   DEFAULT_CATALOG_ID,
-  GENERATED_DEFAULT_METADATA,
   DEFAULT_CATALOG_ID_W_CATALOG_VERSION,
-  globalWindow
+  GENERATED_DEFAULT_METADATA,
+  globalWindow,
+  METADATA_CATALOG_ID,
+  PRODUCT_NAME,
+  PRODUCT_VERSION
 } from './utils/constants';
-import { SAMPLE_A_CATALOG, SAMPLE_A_CATALOG_2 } from './utils/catalog';
+import { enableDebugMode, getPublishers, mockCrypto, restoreStratumMocks } from './utils/helpers';
 import { AModel, PluginAFactory, SamplePublisher } from './utils/sample-plugin';
 
 describe('stratum service base functionality', () => {
@@ -183,7 +183,7 @@ describe('stratum service base functionality', () => {
     const duplicate = stratum.addCatalog({ items: SAMPLE_A_CATALOG_2, ...CATALOG_METADATA });
     expect(duplicate).toBe(first);
     expect(Object.keys(stratum.catalogs)).toHaveLength(2);
-    expect(first.validModels['abc']).toBeDefined();
+    expect(first.validModels.abc).toBeDefined();
     expect(Object.keys(first.validModels)).toHaveLength(catalog1Length + 1);
 
     // Update the metadata
@@ -326,7 +326,7 @@ describe('stratum service base functionality', () => {
     });
 
     it('should store the default stratum id in session storage', () => {
-      let id = stratum.stratumSessionId;
+      const id = stratum.stratumSessionId;
       expect(sessionStorage.getItem(STORED_SESSION_ID_KEY)).toEqual(id);
     });
 

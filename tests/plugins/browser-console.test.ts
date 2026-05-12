@@ -1,12 +1,12 @@
 import { StratumService } from '../../src';
 import {
-  BrowserConsolePlugin,
+  type BrowserConsolePlugin,
   BrowserConsolePluginFactory,
   BrowserConsolePublisher
 } from '../../src/plugins/browser-console';
+import { BASE_CATALOG } from '../utils/catalog';
 import { CATALOG_METADATA, PRODUCT_NAME, PRODUCT_VERSION } from '../utils/constants';
 import { getPublishers, restoreStratumMocks } from '../utils/helpers';
-import { BASE_CATALOG } from '../utils/catalog';
 
 describe('browser console plugin', () => {
   let stratum: StratumService;

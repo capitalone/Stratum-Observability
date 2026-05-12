@@ -1,4 +1,4 @@
-import { BaseEventModel, BasePublisher } from '../base';
+import type { BaseEventModel, BasePublisher } from '../base';
 import type {
   EventOptions,
   EventReplacement,
@@ -6,9 +6,9 @@ import type {
   StratumSnapshot,
   UserDefinedEventOptions
 } from '../types';
-import { RegisteredStratumCatalog } from './catalog';
-import { isDefined, isObject, safeStringify } from './general';
-import { Injector } from './injector';
+import type { RegisteredStratumCatalog } from './catalog';
+import { isDefined, isRecord, safeStringify } from './general';
+import type { Injector } from './injector';
 
 /**
  * Utility function to deep clone a given variable.
@@ -20,7 +20,7 @@ export function clone<T>(source: T): T {
     ? Object.getOwnPropertyNames(source).reduce(
         (o, prop) => {
           Object.defineProperty(o, prop, Object.getOwnPropertyDescriptor(source, prop) as PropertyDescriptor);
-          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+          // biome-ignore lint/suspicious/noExplicitAny: legacy support
           o[prop] = clone((source as { [key: string]: any })[prop]);
           return o;
         },
@@ -36,9 +36,9 @@ export function clone<T>(source: T): T {
  * If the replacement of a given key is a function, replace the placeholder with the return
  * value of the function, given an instance of the underlying event model.
  */
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export function performReplacements(model: BaseEventModel, obj: any, map: { [key: string]: EventReplacement }): void {
-  if (!isObject(obj)) {
+  if (!isRecord(obj)) {
     return;
   }
   Object.keys(obj).forEach((prop) => {
@@ -47,10 +47,10 @@ export function performReplacements(model: BaseEventModel, obj: any, map: { [key
         if (typeof map[search] === 'function') {
           obj[prop] = (<EventReplacementFn>map[search])(model);
         } else {
-          obj[prop] = obj[prop].replace(new RegExp('{{' + search + '}}', 'g'), map[search]);
+          obj[prop] = (obj[prop] as string).replace(new RegExp(`{{${search}}}`, 'g'), map[search] as string);
         }
       });
-    } else if (isObject(obj[prop])) {
+    } else if (isRecord(obj[prop])) {
       performReplacements(model, obj[prop], map);
     }
   });
@@ -86,8 +86,11 @@ export function generateStratumSnapshot(
       let context = plugin.context;
       if (plugin.useGlobalContextPrefix) {
         const prefix = plugin.globalContextPrefix ?? pluginName;
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        context = Object.keys(context).reduce((a, c) => ((a[`${prefix}_${c}`] = context[c]), a), {} as any);
+        const prefixed: Record<string, unknown> = {};
+        Object.keys(context).forEach((c) => {
+          prefixed[`${prefix}_${c}`] = context[c];
+        });
+        context = prefixed;
       }
       globalContext[pluginName] = context;
     }

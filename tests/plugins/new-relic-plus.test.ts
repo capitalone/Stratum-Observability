@@ -1,16 +1,16 @@
-import { BasePublisher, StratumService } from '../../src';
+import { type BasePublisher, StratumService } from '../../src';
+import { NewRelicPluginFactory, NewRelicPublisher } from '../../src/plugins/new-relic';
 import {
   NewRelicApiResponseEventModel,
   NewRelicErrorEventModel,
   NewRelicEventModel,
-  NewRelicPlusPlugin,
+  type NewRelicPlusPlugin,
   NewRelicPlusPluginFactory
 } from '../../src/plugins/new-relic-plus';
-import { AB_TEST_SCHEMA, globalWindow, PLACEHOLDERS, PRODUCT_NAME, PRODUCT_VERSION } from '../utils/constants';
 import { NR_CATALOG, SAMPLE_A_CATALOG } from '../utils/catalog';
+import { AB_TEST_SCHEMA, globalWindow, PLACEHOLDERS, PRODUCT_NAME, PRODUCT_VERSION } from '../utils/constants';
 import { NR_MOCK, SAMPLE_EVENT_OPTIONS } from '../utils/fixtures';
 import { getPublishers, mockNewRelic, mockSessionId, restoreStratumMocks } from '../utils/helpers';
-import { NewRelicPluginFactory, NewRelicPublisher } from '../../src/plugins/new-relic';
 import { PluginAFactory } from '../utils/sample-plugin';
 
 describe('NewRelicPlusPublisher', () => {
@@ -145,11 +145,13 @@ describe('NewRelicPlusPublisher', () => {
         ...Object.fromEntries(setAttributeSpy.mock.calls),
         ...{ name: setNameSpy.mock.calls[0][0] }
       };
-      const catalogEntry = NR_CATALOG.nrApiPlaceholders as any;
+      const catalogEntry = NR_CATALOG.nrApiPlaceholders;
       const propertiesWithPlaceholders = Object.keys(catalogEntry).filter((k) =>
+        // @ts-expect-error testing runtime handling with invalid types
         String(catalogEntry[k]).includes('{{')
       );
       propertiesWithPlaceholders.forEach((key) => {
+        // @ts-expect-error testing runtime handling with invalid types
         const placeholder = catalogEntry[key].replace(/[{}]/g, '');
         const placeholderValue = PLACEHOLDERS[placeholder];
         expect(publishData[key]).toBe(placeholderValue);

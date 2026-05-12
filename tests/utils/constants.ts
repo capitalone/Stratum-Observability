@@ -40,5 +40,5 @@ export const GENERATED_DEFAULT_METADATA = {
   catalogVersion: ''
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 export const globalWindow = window as any;

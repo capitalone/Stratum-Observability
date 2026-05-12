@@ -1,9 +1,9 @@
-import type { AbTest, StratumSnapshot } from '../src/types';
 import { StratumService } from '../src';
+import type { AbTest, StratumSnapshot } from '../src/types';
+import { SAMPLE_A_CATALOG } from './utils/catalog';
 import { AB_TEST_SCHEMA, PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
 import { enableDebugMode, removeAllPublishers, restoreStratumMocks } from './utils/helpers';
-import { SAMPLE_A_CATALOG } from './utils/catalog';
-import { PLUGIN_A_NAME, PluginA, PluginAFactory } from './utils/sample-plugin';
+import { PLUGIN_A_NAME, type PluginA, PluginAFactory } from './utils/sample-plugin';
 
 describe('event publishing', () => {
   let stratum: StratumService;

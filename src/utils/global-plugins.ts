@@ -1,7 +1,7 @@
 import { GLOBAL_LISTENER_KEY } from '../constants';
-import { GenericPlugin } from '../types';
+import type { GenericPlugin } from '../types';
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+// biome-ignore lint/suspicious/noExplicitAny: legacy support
 const g = globalThis as any;
 
 /**

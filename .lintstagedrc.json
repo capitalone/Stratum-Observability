@@ -1,4 +1,0 @@
-{
-  "**/*.{js,ts,json}": ["npm run prettier"],
-  "src/**/*.{js,ts}": ["npm run lint"]
-}

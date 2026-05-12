@@ -1,6 +1,6 @@
 import type { CatalogEvent, EventOptions } from '../types';
 import { clone, performReplacements } from '../utils/event';
-import { Injector } from '../utils/injector';
+import type { Injector } from '../utils/injector';
 
 /**
  * Event models serve as a wrapper of an underlying CatalogEvent instance
@@ -133,7 +133,7 @@ export class BaseEventModel<T extends CatalogEvent = CatalogEvent> {
    * when it's mapped by a publisher.
    */
   getData(options?: Partial<EventOptions>) {
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    // biome-ignore lint/suspicious/noExplicitAny: legacy support
     const item = clone<any>(this.item);
     if (options?.replacements) {
       performReplacements(this, item, options.replacements);
