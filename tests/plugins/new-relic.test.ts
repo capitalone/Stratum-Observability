@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StratumService } from '../../src';
 import { type NewRelicPlugin, NewRelicPluginFactory } from '../../src/plugins/new-relic';
 import { NewRelicPlusPluginFactory } from '../../src/plugins/new-relic-plus';
@@ -41,15 +42,15 @@ describe('publishing events via NewRelicPublisher', () => {
 
   afterEach(() => {
     restoreStratumMocks();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should make a call to window.newrelic', async () => {
-    const interactionSpy = jest.spyOn(globalWindow.newrelic, 'interaction');
-    const endSpy = jest.spyOn(globalWindow.newrelic, 'end');
-    const saveSpy = jest.spyOn(globalWindow.newrelic, 'save');
-    const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
-    const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
+    const interactionSpy = vi.spyOn(globalWindow.newrelic, 'interaction');
+    const endSpy = vi.spyOn(globalWindow.newrelic, 'end');
+    const saveSpy = vi.spyOn(globalWindow.newrelic, 'save');
+    const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
+    const setNameSpy = vi.spyOn(globalWindow.newrelic, 'setName');
 
     const result = await stratum.publishFromCatalog(METADATA_CATALOG_ID, 1, {
       replacements: { PLACEHOLDER_2: 'testEvent' }
@@ -66,11 +67,11 @@ describe('publishing events via NewRelicPublisher', () => {
   });
 
   it('should apply ab test data, if provided', async () => {
-    const interactionSpy = jest.spyOn(globalWindow.newrelic, 'interaction');
-    const saveSpy = jest.spyOn(globalWindow.newrelic, 'save');
-    const endSpy = jest.spyOn(globalWindow.newrelic, 'end');
-    const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
-    const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
+    const interactionSpy = vi.spyOn(globalWindow.newrelic, 'interaction');
+    const saveSpy = vi.spyOn(globalWindow.newrelic, 'save');
+    const endSpy = vi.spyOn(globalWindow.newrelic, 'end');
+    const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
+    const setNameSpy = vi.spyOn(globalWindow.newrelic, 'setName');
 
     const result = await stratum.publishFromCatalog(METADATA_CATALOG_ID, 1, {
       replacements: { PLACEHOLDER_2: 'testEvent' }
@@ -87,7 +88,7 @@ describe('publishing events via NewRelicPublisher', () => {
   });
 
   it('should apply isValid attribute, if provided', async () => {
-    const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
+    const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
 
     const result = await stratum.publishFromCatalog(METADATA_CATALOG_ID, 1, {
       pluginData: {
@@ -100,7 +101,7 @@ describe('publishing events via NewRelicPublisher', () => {
   });
 
   it('should apply context data from other plugins', async () => {
-    const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
+    const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
 
     // Re-declare the stratum service with the NR+ plugin instead
     stratum = new StratumService({

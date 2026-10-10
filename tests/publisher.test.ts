@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StratumService } from '../src';
 import type { AbTest, StratumSnapshot } from '../src/types';
 import { SAMPLE_A_CATALOG } from './utils/catalog';
@@ -24,7 +25,7 @@ describe('event publishing', () => {
 
   afterEach(() => {
     restoreStratumMocks();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('atomic publishing', () => {
@@ -33,7 +34,7 @@ describe('event publishing', () => {
     });
 
     it('should preserve product name set at the time publish is called', async () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
 
       PluginA.setContext('var1', '123');
       PluginA.setContext('var2', 'Home');
@@ -51,7 +52,7 @@ describe('event publishing', () => {
     });
 
     it('should preserve ab tests at the time publish was called', async () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
 
       const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));

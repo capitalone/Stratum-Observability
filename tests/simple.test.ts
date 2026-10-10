@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StratumService, type StratumSnapshot } from '../src';
 import { BrowserConsolePlugin } from '../src/plugins/browser-console';
 import { BASE_CATALOG } from './utils/catalog';
@@ -19,7 +20,7 @@ describe('load stratum without plugins', () => {
 
   afterEach(() => {
     restoreStratumMocks();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('add base events', () => {
@@ -71,7 +72,7 @@ describe('load stratum without plugins', () => {
     });
 
     it('should allow publishing  events', async () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
 
       const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));

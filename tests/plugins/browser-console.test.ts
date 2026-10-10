@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { StratumService } from '../../src';
 import {
   type BrowserConsolePlugin,
@@ -12,10 +13,10 @@ describe('browser console plugin', () => {
   let stratum: StratumService;
   let plugin: BrowserConsolePlugin;
   let publisher: BrowserConsolePublisher;
-  let consoleSpy: jest.SpyInstance;
+  let consoleSpy: Mock;
 
   beforeEach(() => {
-    consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     plugin = BrowserConsolePluginFactory();
     stratum = new StratumService({
       catalog: { items: BASE_CATALOG, ...CATALOG_METADATA },
@@ -28,7 +29,7 @@ describe('browser console plugin', () => {
 
   afterEach(() => {
     restoreStratumMocks();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should successfully publish from catalog', async () => {
@@ -41,7 +42,7 @@ describe('browser console plugin', () => {
   });
 
   it('should publish and log events to the console', async () => {
-    const publishSpy = jest.spyOn(publisher, 'publish');
+    const publishSpy = vi.spyOn(publisher, 'publish');
 
     const expectedContent = JSON.stringify({
       eventType: BASE_CATALOG[1].eventType,

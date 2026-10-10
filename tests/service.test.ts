@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addGlobalPlugin,
   addGlobalStratumSnapshotListener,
@@ -40,7 +41,7 @@ describe('stratum service base functionality', () => {
 
   afterEach(() => {
     enableDebugMode(false);
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     restoreStratumMocks();
   });
 
@@ -234,7 +235,7 @@ describe('stratum service base functionality', () => {
   describe('direct catalog publishing', () => {
     it('should publish an event via catalog.publish and fire the snapshot listener', async () => {
       const catalog = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
-      const listener = jest.fn();
+      const listener = vi.fn();
 
       const snapshot = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation(resolve);
@@ -255,7 +256,7 @@ describe('stratum service base functionality', () => {
 
     it('should allow publishing new keys after addItems at runtime', async () => {
       const catalog = stratum.addCatalog({ items: SAMPLE_A_CATALOG, ...CATALOG_METADATA });
-      const listener = jest.fn();
+      const listener = vi.fn();
       const newCatalog = catalog.addItems(SAMPLE_A_CATALOG_2);
 
       const snapshot = await new Promise<StratumSnapshot>((resolve) => {
@@ -271,7 +272,7 @@ describe('stratum service base functionality', () => {
 
   describe('service publish unhappy paths', () => {
     it('should fail to publish an event if a default catalog is not found', async () => {
-      const warnSpy = jest.spyOn(Logger.prototype, 'debug');
+      const warnSpy = vi.spyOn(Logger.prototype, 'debug');
       stratum = new StratumService({ productName: PRODUCT_NAME, productVersion: PRODUCT_VERSION });
       const result = await stratum.publish('foo');
       expect(result).toBe(false);
@@ -279,14 +280,14 @@ describe('stratum service base functionality', () => {
     });
 
     it('should warn if catalog to publish from cannot be found', async () => {
-      const warnSpy = jest.spyOn(Logger.prototype, 'debug');
+      const warnSpy = vi.spyOn(Logger.prototype, 'debug');
       const result = await stratum.publishFromCatalog('unknowncatalogid', 1);
       expect(result).toBe(false);
       expect(warnSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should warn if the key to publish in catalog cannot be found', async () => {
-      const warnSpy = jest.spyOn(Logger.prototype, 'debug');
+      const warnSpy = vi.spyOn(Logger.prototype, 'debug');
       const result = await stratum.publishFromCatalog(DEFAULT_CATALOG_ID, 'unknownkey');
       expect(result).toBe(false);
       expect(warnSpy).toHaveBeenCalledTimes(1);
@@ -346,21 +347,21 @@ describe('stratum service base functionality', () => {
     });
 
     it('should fail to add event listener if an error occurs', () => {
-      jest.spyOn(utils, 'isDefined').mockImplementation(() => {
+      vi.spyOn(utils, 'isDefined').mockImplementation(() => {
         throw new Error();
       });
       expect(stratum.addSnapshotListener(() => {})).toBe(false);
     });
 
     it('should add event listener to the global object', () => {
-      const mock = jest.fn();
+      const mock = vi.fn();
       expect(stratum.addSnapshotListener(mock)).toBe(true);
       expect(globalWindow[`stratum_config_${PRODUCT_NAME}`].listeners[0]).toStrictEqual(mock);
     });
 
     it('should read in all valid event listeners', () => {
-      const mockFn1 = jest.fn();
-      const mockFn2 = jest.fn();
+      const mockFn1 = vi.fn();
+      const mockFn2 = vi.fn();
 
       enableDebugMode(true);
       stratum.addSnapshotListener(mockFn1);
