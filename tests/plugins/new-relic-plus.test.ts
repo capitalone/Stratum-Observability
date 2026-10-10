@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type BasePublisher, StratumService } from '../../src';
 import { NewRelicPluginFactory, NewRelicPublisher } from '../../src/plugins/new-relic';
 import {
@@ -90,16 +91,16 @@ describe('NewRelicPlusPublisher', () => {
 
     afterEach(() => {
       restoreStratumMocks();
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should process the nrEvent event type', async () => {
-      const publisherSpy = jest.spyOn(publisher, 'publish');
-      const interactionSpy = jest.spyOn(globalWindow.newrelic, 'interaction');
-      const saveSpy = jest.spyOn(globalWindow.newrelic, 'save');
-      const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
-      const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
-      const endSpy = jest.spyOn(globalWindow.newrelic, 'end');
+      const publisherSpy = vi.spyOn(publisher, 'publish');
+      const interactionSpy = vi.spyOn(globalWindow.newrelic, 'interaction');
+      const saveSpy = vi.spyOn(globalWindow.newrelic, 'save');
+      const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
+      const setNameSpy = vi.spyOn(globalWindow.newrelic, 'setName');
+      const endSpy = vi.spyOn(globalWindow.newrelic, 'end');
 
       const result = await stratum.publish('nrEventValid');
 
@@ -115,12 +116,12 @@ describe('NewRelicPlusPublisher', () => {
     });
 
     it('should process the nrApi event type', async () => {
-      const publisherSpy = jest.spyOn(publisher, 'publish');
-      const interactionSpy = jest.spyOn(globalWindow.newrelic, 'interaction');
-      const saveSpy = jest.spyOn(globalWindow.newrelic, 'save');
-      const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
-      const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
-      const endSpy = jest.spyOn(globalWindow.newrelic, 'end');
+      const publisherSpy = vi.spyOn(publisher, 'publish');
+      const interactionSpy = vi.spyOn(globalWindow.newrelic, 'interaction');
+      const saveSpy = vi.spyOn(globalWindow.newrelic, 'save');
+      const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
+      const setNameSpy = vi.spyOn(globalWindow.newrelic, 'setName');
+      const endSpy = vi.spyOn(globalWindow.newrelic, 'end');
 
       const result = await stratum.publish('nrApiValid');
 
@@ -137,8 +138,8 @@ describe('NewRelicPlusPublisher', () => {
     });
 
     it('should handle placeholders within the nrApi event type', async () => {
-      const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
-      const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
+      const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
+      const setNameSpy = vi.spyOn(globalWindow.newrelic, 'setName');
       const result = await stratum.publish('nrApiPlaceholders', SAMPLE_EVENT_OPTIONS);
       expect(result).toBe(true);
       const publishData = {
@@ -159,12 +160,12 @@ describe('NewRelicPlusPublisher', () => {
     });
 
     it('should process the nrError event type', async () => {
-      const publisherSpy = jest.spyOn(publisher, 'publish');
-      const interactionSpy = jest.spyOn(globalWindow.newrelic, 'interaction');
-      const saveSpy = jest.spyOn(globalWindow.newrelic, 'save');
-      const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
-      const setNameSpy = jest.spyOn(globalWindow.newrelic, 'setName');
-      const endSpy = jest.spyOn(globalWindow.newrelic, 'end');
+      const publisherSpy = vi.spyOn(publisher, 'publish');
+      const interactionSpy = vi.spyOn(globalWindow.newrelic, 'interaction');
+      const saveSpy = vi.spyOn(globalWindow.newrelic, 'save');
+      const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
+      const setNameSpy = vi.spyOn(globalWindow.newrelic, 'setName');
+      const endSpy = vi.spyOn(globalWindow.newrelic, 'end');
 
       const result = await stratum.publish('nrErrorValid');
 
@@ -200,7 +201,7 @@ describe('NewRelicPlusPublisher', () => {
 
     afterEach(() => {
       restoreStratumMocks();
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('should set the default context', () => {
@@ -224,7 +225,7 @@ describe('NewRelicPlusPublisher', () => {
     });
 
     it('should not publish undefined variables', async () => {
-      const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
+      const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
       await stratum.publish('nrEventValid');
       const attributes = Object.fromEntries(setAttributeSpy.mock.calls);
       expect(Object.keys(attributes)).not.toContain('stratum_myCustomVar');
@@ -232,7 +233,7 @@ describe('NewRelicPlusPublisher', () => {
     });
 
     it('should pass prefixed context variables when publishing nr events', async () => {
-      const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
+      const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
       nrpPlugin.setContext('myCustomVar', 'abc');
       nrpPlugin.setContext('myCustomVar2', false);
       await stratum.publish('nrEventValid');
@@ -242,7 +243,7 @@ describe('NewRelicPlusPublisher', () => {
     });
 
     it('should include the default context when publishing other events', async () => {
-      const setAttributeSpy = jest.spyOn(globalWindow.newrelic, 'setAttribute');
+      const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
       stratum.addPlugin(PluginAFactory());
       nrpPlugin.setContext('myCustomVar', 'test1');
       nrpPlugin.setContext('myCustomVar2', 'test2');

@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BasePlugin, Injector, StratumService } from '../src';
 import type { PluginHooks, StratumSnapshot } from '../src/types';
 import { SAMPLE_A_CATALOG } from './utils/catalog';
@@ -33,13 +34,13 @@ describe('stratum base plugin functionality', () => {
 
   afterEach(() => {
     restoreStratumMocks();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('run time plugin registration', () => {
     it('should allow run time plugin registration and populate across the publishing flow', async () => {
       stratum.addPlugin(PluginBFactory({ pluginOptions }));
-      const listener = jest.fn();
+      const listener = vi.fn();
       const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));
         stratum.addSnapshotListener(listener);
@@ -56,7 +57,7 @@ describe('stratum base plugin functionality', () => {
 
     it('should allow plugin b publishers to intercept events from plugin a via acceptedEventModels', async () => {
       stratum.addPlugin(PluginBFactory({ pluginOptions, acceptedEventModels: [AModel] }));
-      const listener = jest.fn();
+      const listener = vi.fn();
       const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));
         stratum.addSnapshotListener(listener);
@@ -98,7 +99,7 @@ describe('stratum base plugin functionality', () => {
 
   describe('plugin lifecycle hooks', () => {
     it('should fire onRegister when plugin is loaded into the StratumService', () => {
-      const onRegisterHookSpy = jest.spyOn(PluginB.prototype, 'onRegister');
+      const onRegisterHookSpy = vi.spyOn(PluginB.prototype, 'onRegister');
       const pluginB = PluginBFactory({ pluginOptions });
       expect(onRegisterHookSpy).toHaveBeenCalledTimes(0);
       stratum.addPlugin(pluginB);
@@ -124,7 +125,7 @@ describe('stratum base plugin functionality', () => {
 
       stratum.addPlugin(new HooksPlugin());
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation(resolve);
         stratum.addSnapshotListener(listener);
@@ -138,7 +139,7 @@ describe('stratum base plugin functionality', () => {
 
   describe('atomic publishing', () => {
     it('should preserve plugin vars at the time publish was called', async () => {
-      const listener = jest.fn();
+      const listener = vi.fn();
 
       const event = await new Promise<StratumSnapshot>((resolve) => {
         listener.mockImplementation((event) => resolve(event));

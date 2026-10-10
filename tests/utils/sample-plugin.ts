@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { BaseEventModel, BasePlugin, BasePublisher } from '../../src';
 import type { CatalogEvent, PluginFactory, PluginFactoryWithRequiredOptions, StratumSnapshot } from '../../src/types';
 
@@ -56,7 +57,7 @@ export class BModel extends BaseEventModel<BEvent> {}
  * Publishers
  */
 
-export const samplePublisherSdk = jest.fn();
+export const samplePublisherSdk = vi.fn();
 
 export class SamplePublisher extends BasePublisher {
   name: string;

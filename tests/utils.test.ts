@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import {
   addGlobalPlugin,
   addGlobalStratumSnapshotListener,
@@ -26,7 +27,7 @@ describe('util functions', () => {
 
   afterEach(() => {
     restoreStratumMocks();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('catalog', () => {
@@ -74,13 +75,13 @@ describe('util functions', () => {
     describe('RegisteredStratumCatalog', () => {
       const id = 'catalog-id';
       let injector: Injector;
-      let publishFn: jest.Mock;
+      let publishFn: Mock;
       const options = { items: SAMPLE_A_CATALOG, ...CATALOG_METADATA };
 
       beforeEach(() => {
         injector = new Injector(PRODUCT_NAME, PRODUCT_VERSION);
         injector.registerPlugin(PluginAFactory());
-        publishFn = jest.fn();
+        publishFn = vi.fn();
       });
 
       it('should handle validating a stratum catalog on construction', () => {
@@ -189,18 +190,18 @@ describe('util functions', () => {
       afterEach(() => {
         delete globalWindow[configKey];
         delete globalWindow[GLOBAL_LISTENER_KEY];
-        jest.restoreAllMocks();
+        vi.restoreAllMocks();
       });
 
       it('should add event listener to globalThis', () => {
-        const mock = jest.fn();
+        const mock = vi.fn();
         expect(addStratumSnapshotListener(PRODUCT_NAME, mock)).toBe(true);
         expect(globalWindow[configKey].listeners[0]).toStrictEqual(mock);
       });
 
       it('should read in all valid snapshot listeners', () => {
-        const mockFn1 = jest.fn();
-        const mockFn2 = jest.fn();
+        const mockFn1 = vi.fn();
+        const mockFn2 = vi.fn();
 
         const result1 = addStratumSnapshotListener(PRODUCT_NAME, mockFn1);
         const result2 = addStratumSnapshotListener(PRODUCT_NAME, mockFn2);
@@ -210,8 +211,8 @@ describe('util functions', () => {
       });
 
       it('should add global snapshot listeners', () => {
-        const mockFn1 = jest.fn();
-        const mockFn2 = jest.fn();
+        const mockFn1 = vi.fn();
+        const mockFn2 = vi.fn();
 
         const result1 = addGlobalStratumSnapshotListener(mockFn1);
         const result2 = addGlobalStratumSnapshotListener(mockFn2);
@@ -238,7 +239,7 @@ describe('util functions', () => {
       });
 
       it('should return a random uuid if an error is encountered', () => {
-        jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
           throw new Error();
         });
         expect(isUuid(generateDefaultSessionId())).toBe(true);
@@ -248,7 +249,7 @@ describe('util functions', () => {
     describe('Logger', () => {
       it('should execute console.debug only if debugModeEnabled', () => {
         const logger = new Logger();
-        const loggerSpy = jest.spyOn(console, 'debug').mockImplementation();
+        const loggerSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
         const str = 'teststring';
 
         logger.debug(str);
@@ -270,7 +271,7 @@ describe('util functions', () => {
       });
 
       it('should return false if session storage is unavailable', () => {
-        jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
           throw new Error();
         });
         expect(debugModeEnabled()).toEqual(false);
