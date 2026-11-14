@@ -19,6 +19,7 @@ import {
   enableDebugMode,
   GENERATED_DEFAULT_METADATA,
   getPublishers,
+  getStratumGlobalConfig,
   METADATA_CATALOG_ID,
   PluginAFactory,
   PRODUCT_NAME,
@@ -350,8 +351,7 @@ describe('stratum service base functionality', () => {
     it('should add event listener to the global object', () => {
       const mock = vi.fn();
       expect(stratum.addSnapshotListener(mock)).toBe(true);
-      const g = globalThis as unknown as Record<string, { listeners: unknown[] }>;
-      expect(g[`stratum_config_${PRODUCT_NAME}`].listeners[0]).toStrictEqual(mock);
+      expect(getStratumGlobalConfig(DEFAULT_CONFIG_KEY).listeners[0]).toStrictEqual(mock);
     });
 
     it('should read in all valid event listeners', () => {
