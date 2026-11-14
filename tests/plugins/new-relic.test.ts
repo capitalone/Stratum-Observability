@@ -1,24 +1,28 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { StratumService } from '../../src';
-import { type NewRelicPlugin, NewRelicPluginFactory } from '../../src/plugins/new-relic';
-import { NewRelicPlusPluginFactory } from '../../src/plugins/new-relic-plus';
-import { NR_CATALOG, SAMPLE_A_CATALOG } from '../utils/catalog';
+import { type NewRelicPlugin, NewRelicPluginFactory } from '@plugins/new-relic';
+import { NewRelicPlusPluginFactory } from '@plugins/new-relic-plus';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { StratumService } from '@';
 import {
   AB_TEST_SCHEMA,
   CATALOG_METADATA,
-  globalWindow,
   METADATA_CATALOG_ID,
+  mockNewRelic,
+  mockSessionId,
+  NR_CATALOG,
+  NR_MOCK,
+  PLUGIN_A_NAME,
+  type PluginA,
+  PluginAFactory,
   PRODUCT_NAME,
-  PRODUCT_VERSION
-} from '../utils/constants';
-import { NR_MOCK } from '../utils/fixtures';
-import { mockCrypto, mockNewRelic, mockSessionId, restoreStratumMocks } from '../utils/helpers';
-import { PLUGIN_A_NAME, type PluginA, PluginAFactory } from '../utils/sample-plugin';
+  PRODUCT_VERSION,
+  SAMPLE_A_CATALOG
+} from '../utils';
 
 describe('publishing events via NewRelicPublisher', () => {
   let stratum: StratumService;
   let PluginA: PluginA;
   let NewRelicPlugin: NewRelicPlugin;
+  let nrMock: ReturnType<typeof mockNewRelic>;
 
   const defaultContext = {
     var1: 'var1',
@@ -26,8 +30,7 @@ describe('publishing events via NewRelicPublisher', () => {
   };
 
   beforeEach(() => {
-    mockCrypto();
-    mockNewRelic();
+    nrMock = mockNewRelic();
     mockSessionId();
     PluginA = PluginAFactory({ defaultContext });
     NewRelicPlugin = NewRelicPluginFactory();
@@ -40,56 +43,37 @@ describe('publishing events via NewRelicPublisher', () => {
     stratum.startAbTest(AB_TEST_SCHEMA);
   });
 
-  afterEach(() => {
-    restoreStratumMocks();
-    vi.restoreAllMocks();
-  });
-
   it('should make a call to window.newrelic', async () => {
-    const interactionSpy = vi.spyOn(globalWindow.newrelic, 'interaction');
-    const endSpy = vi.spyOn(globalWindow.newrelic, 'end');
-    const saveSpy = vi.spyOn(globalWindow.newrelic, 'save');
-    const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
-    const setNameSpy = vi.spyOn(globalWindow.newrelic, 'setName');
-
     const result = await stratum.publishFromCatalog(METADATA_CATALOG_ID, 1, {
       replacements: { PLACEHOLDER_2: 'testEvent' }
     });
 
     expect(result).toBe(true);
-    expect(setAttributeSpy).toHaveBeenCalledTimes(Object.keys(NR_MOCK.sampleA).length);
-    expect(Object.fromEntries(setAttributeSpy.mock.calls)).toMatchObject(NR_MOCK.sampleA);
-    expect(setNameSpy).toHaveBeenCalledTimes(1);
-    expect(setNameSpy).toHaveBeenCalledWith('testEvent');
-    expect(saveSpy).toHaveBeenCalledTimes(1);
-    expect(interactionSpy).toHaveBeenCalledTimes(2);
-    expect(endSpy).toHaveBeenCalledTimes(2);
+    expect(nrMock.setAttribute).toHaveBeenCalledTimes(Object.keys(NR_MOCK.sampleA).length);
+    expect(Object.fromEntries(nrMock.setAttribute.mock.calls)).toMatchObject(NR_MOCK.sampleA);
+    expect(nrMock.setName).toHaveBeenCalledTimes(1);
+    expect(nrMock.setName).toHaveBeenCalledWith('testEvent');
+    expect(nrMock.save).toHaveBeenCalledTimes(1);
+    expect(nrMock.interaction).toHaveBeenCalledTimes(2);
+    expect(nrMock.end).toHaveBeenCalledTimes(2);
   });
 
   it('should apply ab test data, if provided', async () => {
-    const interactionSpy = vi.spyOn(globalWindow.newrelic, 'interaction');
-    const saveSpy = vi.spyOn(globalWindow.newrelic, 'save');
-    const endSpy = vi.spyOn(globalWindow.newrelic, 'end');
-    const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
-    const setNameSpy = vi.spyOn(globalWindow.newrelic, 'setName');
-
     const result = await stratum.publishFromCatalog(METADATA_CATALOG_ID, 1, {
       replacements: { PLACEHOLDER_2: 'testEvent' }
     });
 
     expect(result).toBe(true);
-    expect(setAttributeSpy).toHaveBeenCalledTimes(Object.keys(NR_MOCK.sampleA).length);
-    expect(Object.fromEntries(setAttributeSpy.mock.calls)).toMatchObject(NR_MOCK.sampleA);
-    expect(setNameSpy).toHaveBeenCalledTimes(1);
-    expect(setNameSpy).toHaveBeenCalledWith('testEvent');
-    expect(saveSpy).toHaveBeenCalledTimes(1);
-    expect(interactionSpy).toHaveBeenCalledTimes(2);
-    expect(endSpy).toHaveBeenCalledTimes(2);
+    expect(nrMock.setAttribute).toHaveBeenCalledTimes(Object.keys(NR_MOCK.sampleA).length);
+    expect(Object.fromEntries(nrMock.setAttribute.mock.calls)).toMatchObject(NR_MOCK.sampleA);
+    expect(nrMock.setName).toHaveBeenCalledTimes(1);
+    expect(nrMock.setName).toHaveBeenCalledWith('testEvent');
+    expect(nrMock.save).toHaveBeenCalledTimes(1);
+    expect(nrMock.interaction).toHaveBeenCalledTimes(2);
+    expect(nrMock.end).toHaveBeenCalledTimes(2);
   });
 
   it('should apply isValid attribute, if provided', async () => {
-    const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
-
     const result = await stratum.publishFromCatalog(METADATA_CATALOG_ID, 1, {
       pluginData: {
         newRelic: { isValid: true }
@@ -97,12 +81,10 @@ describe('publishing events via NewRelicPublisher', () => {
     });
 
     expect(result).toBe(true);
-    expect(setAttributeSpy.mock.calls.find((x) => x[0] === 'isValid')?.[1]).toBe(true);
+    expect(nrMock.setAttribute.mock.calls.find((x) => x[0] === 'isValid')?.[1]).toBe(true);
   });
 
   it('should apply context data from other plugins', async () => {
-    const setAttributeSpy = vi.spyOn(globalWindow.newrelic, 'setAttribute');
-
     // Re-declare the stratum service with the NR+ plugin instead
     stratum = new StratumService({
       plugins: [PluginA],
@@ -116,7 +98,7 @@ describe('publishing events via NewRelicPublisher', () => {
 
     expect(result).toBe(true);
     for (const [key, value] of Object.entries(defaultContext)) {
-      expect(setAttributeSpy).toHaveBeenCalledWith(`${PLUGIN_A_NAME}_${key}`, value);
+      expect(nrMock.setAttribute).toHaveBeenCalledWith(`${PLUGIN_A_NAME}_${key}`, value);
     }
   });
 });

@@ -1,10 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { StratumService, type StratumSnapshot } from '../src';
-import { BrowserConsolePlugin } from '../src/plugins/browser-console';
-import { BASE_CATALOG } from './utils/catalog';
-import { PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
-import { BASE_EVENT_MOCK } from './utils/fixtures';
-import { enableDebugMode, mockSessionId, restoreStratumMocks } from './utils/helpers';
+import { BrowserConsolePlugin } from '@plugins/browser-console';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { StratumService, type StratumSnapshot } from '@';
+import { BASE_CATALOG, BASE_EVENT_MOCK, enableDebugMode, mockSessionId, PRODUCT_NAME, PRODUCT_VERSION } from './utils';
 
 describe('load stratum without plugins', () => {
   let stratum: StratumService;
@@ -16,11 +13,6 @@ describe('load stratum without plugins', () => {
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION
     });
-  });
-
-  afterEach(() => {
-    restoreStratumMocks();
-    vi.restoreAllMocks();
   });
 
   describe('add base events', () => {

@@ -1,13 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
-import { StratumService } from '../../src';
 import {
   type BrowserConsolePlugin,
   BrowserConsolePluginFactory,
   BrowserConsolePublisher
-} from '../../src/plugins/browser-console';
+} from '@plugins/browser-console';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { StratumService } from '@';
+import { CATALOG_METADATA, getPublishers, PRODUCT_NAME, PRODUCT_VERSION } from '../utils';
 import { BASE_CATALOG } from '../utils/catalog';
-import { CATALOG_METADATA, PRODUCT_NAME, PRODUCT_VERSION } from '../utils/constants';
-import { getPublishers, restoreStratumMocks } from '../utils/helpers';
 
 describe('browser console plugin', () => {
   let stratum: StratumService;
@@ -25,11 +24,6 @@ describe('browser console plugin', () => {
       productVersion: PRODUCT_VERSION
     });
     publisher = plugin.publishers[0];
-  });
-
-  afterEach(() => {
-    restoreStratumMocks();
-    vi.restoreAllMocks();
   });
 
   it('should successfully publish from catalog', async () => {

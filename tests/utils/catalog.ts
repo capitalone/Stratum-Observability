@@ -1,5 +1,5 @@
-import { type NewRelicEvents, NewRelicEventType } from '../../src/plugins/new-relic-plus';
-import type { StratumCatalog } from '../../src/types';
+import { type NewRelicEvents, NewRelicEventType } from '@plugins/new-relic-plus';
+import type { StratumCatalog } from '@types';
 import { type AEvent, type BEvent, SampleEventType } from './sample-plugin';
 
 export const SAMPLE_A_CATALOG = {

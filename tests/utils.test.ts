@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import {
   addGlobalPlugin,
   addGlobalStratumSnapshotListener,
@@ -14,22 +14,26 @@ import {
   removeGlobalPlugin,
   STORED_SESSION_ID_KEY,
   uuid
-} from '../src';
-import { INVALID_SAMPLE_CATALOG, SAMPLE_A_CATALOG, SAMPLE_A_CATALOG_2 } from './utils/catalog';
-import { CATALOG_METADATA, globalWindow, PRODUCT_NAME, PRODUCT_VERSION, SESSION_ID } from './utils/constants';
-import { enableDebugMode, isUuid, mockCrypto, restoreStratumMocks } from './utils/helpers';
-import { PluginA, PluginAFactory, PluginB, SamplePublisher } from './utils/sample-plugin';
+} from '@';
+import {
+  CATALOG_METADATA,
+  DEFAULT_CONFIG_KEY,
+  enableDebugMode,
+  getStratumGlobalConfig,
+  INVALID_SAMPLE_CATALOG,
+  isUuid,
+  PluginA,
+  PluginAFactory,
+  PluginB,
+  PRODUCT_NAME,
+  PRODUCT_VERSION,
+  SAMPLE_A_CATALOG,
+  SAMPLE_A_CATALOG_2,
+  SamplePublisher,
+  SESSION_ID
+} from './utils';
 
 describe('util functions', () => {
-  beforeEach(() => {
-    mockCrypto();
-  });
-
-  afterEach(() => {
-    restoreStratumMocks();
-    vi.restoreAllMocks();
-  });
-
   describe('catalog', () => {
     describe('generateCatalogId()', () => {
       it('should use the componentName and catalogVersion if provided', () => {
@@ -185,18 +189,10 @@ describe('util functions', () => {
 
   describe('env', () => {
     describe('stratum event listeners', () => {
-      const configKey = `stratum_config_${PRODUCT_NAME}`;
-
-      afterEach(() => {
-        delete globalWindow[configKey];
-        delete globalWindow[GLOBAL_LISTENER_KEY];
-        vi.restoreAllMocks();
-      });
-
       it('should add event listener to globalThis', () => {
         const mock = vi.fn();
         expect(addStratumSnapshotListener(PRODUCT_NAME, mock)).toBe(true);
-        expect(globalWindow[configKey].listeners[0]).toStrictEqual(mock);
+        expect(getStratumGlobalConfig(DEFAULT_CONFIG_KEY).listeners[0]).toStrictEqual(mock);
       });
 
       it('should read in all valid snapshot listeners', () => {
@@ -207,7 +203,7 @@ describe('util functions', () => {
         const result2 = addStratumSnapshotListener(PRODUCT_NAME, mockFn2);
         expect(result1).toBe(true);
         expect(result2).toBe(true);
-        expect(globalWindow[configKey].listeners).toStrictEqual([mockFn1, mockFn2]);
+        expect(getStratumGlobalConfig(DEFAULT_CONFIG_KEY).listeners).toStrictEqual([mockFn1, mockFn2]);
       });
 
       it('should add global snapshot listeners', () => {
@@ -218,7 +214,7 @@ describe('util functions', () => {
         const result2 = addGlobalStratumSnapshotListener(mockFn2);
         expect(result1).toBe(true);
         expect(result2).toBe(true);
-        expect(globalWindow[GLOBAL_LISTENER_KEY].listeners).toStrictEqual([mockFn1, mockFn2]);
+        expect(getStratumGlobalConfig(GLOBAL_LISTENER_KEY).listeners).toStrictEqual([mockFn1, mockFn2]);
       });
     });
 
@@ -289,7 +285,7 @@ describe('util functions', () => {
       });
 
       it('should return the nil UUID if crypto library is unavailable', () => {
-        delete globalWindow.crypto;
+        vi.stubGlobal('crypto', undefined);
         expect(uuid()).toEqual('00000000-0000-0000-0000-000000000000');
       });
     });
@@ -299,38 +295,37 @@ describe('util functions', () => {
     it('should get global plugins', async () => {
       const plugin1 = new PluginA();
       const plugin2 = new PluginB({ versionNumber: 1, apiKey: 'api' }, new SamplePublisher('sample'));
-      globalWindow[GLOBAL_LISTENER_KEY] = {
+      vi.stubGlobal(GLOBAL_LISTENER_KEY, {
         globalPlugins: [plugin1, plugin2]
-      };
+      });
       const globalPlugins = getGlobalPlugins();
       expect(globalPlugins).toEqual([plugin1, plugin2]);
     });
 
     it('should add a plugin to the global namespace', async () => {
-      globalWindow[GLOBAL_LISTENER_KEY] = {};
       const plugin = new PluginA();
       addGlobalPlugin(plugin);
-      expect(globalWindow[GLOBAL_LISTENER_KEY].globalPlugins).toEqual([plugin]);
+      expect(getStratumGlobalConfig(GLOBAL_LISTENER_KEY).globalPlugins).toEqual([plugin]);
     });
 
     it('should remove a plugin from the global namespace', async () => {
       const plugin1 = new PluginA();
       const plugin2 = new PluginB({ versionNumber: 1, apiKey: 'api' }, new SamplePublisher('sample'));
-      globalWindow[GLOBAL_LISTENER_KEY] = {
+      vi.stubGlobal(GLOBAL_LISTENER_KEY, {
         globalPlugins: [plugin1, plugin2]
-      };
+      });
       removeGlobalPlugin('pluginA');
-      expect(globalWindow[GLOBAL_LISTENER_KEY].globalPlugins).toEqual([plugin2]);
+      expect(getStratumGlobalConfig(GLOBAL_LISTENER_KEY).globalPlugins).toEqual([plugin2]);
     });
 
     it('should not remove a plugin that does not exist', async () => {
       const plugin1 = new PluginA();
       const plugin2 = new PluginB({ versionNumber: 1, apiKey: 'api' }, new SamplePublisher('sample'));
-      globalWindow[GLOBAL_LISTENER_KEY] = {
+      vi.stubGlobal(GLOBAL_LISTENER_KEY, {
         globalPlugins: [plugin1, plugin2]
-      };
+      });
       removeGlobalPlugin('pluginC');
-      expect(globalWindow[GLOBAL_LISTENER_KEY].globalPlugins).toEqual([plugin1, plugin2]);
+      expect(getStratumGlobalConfig(GLOBAL_LISTENER_KEY).globalPlugins).toEqual([plugin1, plugin2]);
     });
   });
 });

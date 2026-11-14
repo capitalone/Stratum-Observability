@@ -1,20 +1,22 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BasePlugin, Injector, StratumService } from '../src';
-import type { PluginHooks, StratumSnapshot } from '../src/types';
-import { SAMPLE_A_CATALOG } from './utils/catalog';
-import { PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
-import { enableDebugMode, getPublishers, restoreStratumMocks } from './utils/helpers';
+import type { PluginHooks, StratumSnapshot } from '@types';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { BasePlugin, Injector, StratumService } from '@';
 import {
   AModel,
   EmptyModel,
+  enableDebugMode,
+  getPublishers,
   PLUGIN_A_NAME,
   PLUGIN_B_NAME,
   type PluginA,
   PluginAFactory,
   PluginB,
   PluginBFactory,
-  type PluginBOptions
-} from './utils/sample-plugin';
+  type PluginBOptions,
+  PRODUCT_NAME,
+  PRODUCT_VERSION,
+  SAMPLE_A_CATALOG
+} from './utils';
 
 describe('stratum base plugin functionality', () => {
   let stratum: StratumService;
@@ -30,11 +32,6 @@ describe('stratum base plugin functionality', () => {
       productVersion: PRODUCT_VERSION,
       plugins: [pluginA]
     });
-  });
-
-  afterEach(() => {
-    restoreStratumMocks();
-    vi.restoreAllMocks();
   });
 
   describe('run time plugin registration', () => {
