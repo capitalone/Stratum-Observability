@@ -19,8 +19,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "esnext",
-    "types": ["vitest/globals"]
+    "target": "esnext"
   },
   "include": ["src"]
 }

@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { BrowserConsolePlugin, BrowserConsolePublisher } from '@plugins/browser-console';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addGlobalPlugin,
   addGlobalStratumSnapshotListener,
@@ -7,42 +8,37 @@ import {
   STORED_SESSION_ID_KEY,
   StratumService,
   type StratumSnapshot
-} from '../src';
-import { BrowserConsolePlugin, BrowserConsolePublisher } from '../src/plugins/browser-console';
-import * as utils from '../src/utils/general';
-import { SAMPLE_A_CATALOG, SAMPLE_A_CATALOG_2 } from './utils/catalog';
+} from '@';
 import {
   AB_TEST_SCHEMA,
+  AModel,
   CATALOG_METADATA,
   DEFAULT_CATALOG_ID,
   DEFAULT_CATALOG_ID_W_CATALOG_VERSION,
+  DEFAULT_CONFIG_KEY,
+  enableDebugMode,
   GENERATED_DEFAULT_METADATA,
-  globalWindow,
+  getPublishers,
   METADATA_CATALOG_ID,
+  PluginAFactory,
   PRODUCT_NAME,
-  PRODUCT_VERSION
-} from './utils/constants';
-import { enableDebugMode, getPublishers, mockCrypto, restoreStratumMocks } from './utils/helpers';
-import { AModel, PluginAFactory, SamplePublisher } from './utils/sample-plugin';
+  PRODUCT_VERSION,
+  SAMPLE_A_CATALOG,
+  SAMPLE_A_CATALOG_2,
+  SamplePublisher
+} from './utils';
 
 describe('stratum service base functionality', () => {
   let stratum: StratumService;
   const catalog1Length = Object.keys(SAMPLE_A_CATALOG).length;
 
   beforeEach(() => {
-    mockCrypto();
     stratum = new StratumService({
       catalog: { items: SAMPLE_A_CATALOG },
       productName: PRODUCT_NAME,
       productVersion: PRODUCT_VERSION,
       plugins: [PluginAFactory()]
     });
-  });
-
-  afterEach(() => {
-    enableDebugMode(false);
-    vi.restoreAllMocks();
-    restoreStratumMocks();
   });
 
   it('should set the stratum service id', () => {
@@ -347,16 +343,15 @@ describe('stratum service base functionality', () => {
     });
 
     it('should fail to add event listener if an error occurs', () => {
-      vi.spyOn(utils, 'isDefined').mockImplementation(() => {
-        throw new Error();
-      });
+      vi.stubGlobal(DEFAULT_CONFIG_KEY, Object.freeze({}));
       expect(stratum.addSnapshotListener(() => {})).toBe(false);
     });
 
     it('should add event listener to the global object', () => {
       const mock = vi.fn();
       expect(stratum.addSnapshotListener(mock)).toBe(true);
-      expect(globalWindow[`stratum_config_${PRODUCT_NAME}`].listeners[0]).toStrictEqual(mock);
+      const g = globalThis as unknown as Record<string, { listeners: unknown[] }>;
+      expect(g[`stratum_config_${PRODUCT_NAME}`].listeners[0]).toStrictEqual(mock);
     });
 
     it('should read in all valid event listeners', () => {

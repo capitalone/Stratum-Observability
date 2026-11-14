@@ -1,6 +1,6 @@
-import { webcrypto } from 'node:crypto';
-import { DEBUG_KEY, GLOBAL_LISTENER_KEY, STORED_SESSION_ID_KEY, type StratumService } from '../../src';
-import { globalWindow, SESSION_ID } from './constants';
+import { type Mock, vi } from 'vitest';
+import { DEBUG_KEY, STORED_SESSION_ID_KEY, type StratumService } from '@';
+import { SESSION_ID } from './constants';
 
 export function getPublishers(service: StratumService) {
   return Object.values(service.publishers);
@@ -15,35 +15,30 @@ export function isUuid(uuid: string) {
   return regExp.test(uuid);
 }
 
-export function mockNewRelic() {
-  globalWindow.newrelic = {
-    end: () => globalWindow.newrelic,
-    interaction: () => globalWindow.newrelic,
-    save: () => globalWindow.newrelic,
-    setAttribute: () => globalWindow.newrelic,
-    setName: () => globalWindow.newrelic
-  };
+export function getStratumGlobalConfig(key: string) {
+  const globals = globalThis as unknown as Record<string, { listeners: unknown[]; globalPlugins: unknown[] }>;
+  return globals[key];
 }
 
-export function mockCrypto() {
-  Object.defineProperty(globalThis, 'crypto', {
-    value: webcrypto,
-    configurable: true
-  });
+export function mockNewRelic() {
+  const METHODS = ['end', 'interaction', 'save', 'setAttribute', 'setName'] as const;
+  type NewRelicMock = Record<(typeof METHODS)[number], Mock>;
+  const nr = {} as NewRelicMock;
+  for (const m of METHODS) {
+    nr[m] = vi.fn(() => nr);
+  }
+  vi.stubGlobal('newrelic', nr);
+  return nr;
 }
 
 export function restoreStratumMocks() {
-  Object.keys(globalWindow).forEach((k) => {
-    if (k.startsWith('stratum')) {
-      delete globalWindow[k];
+  for (const key of Reflect.ownKeys(globalThis)) {
+    if (typeof key === 'string' && key.startsWith('stratum')) {
+      Reflect.deleteProperty(globalThis, key);
     }
-  });
-  delete globalWindow[GLOBAL_LISTENER_KEY];
-  delete globalWindow.newRelic;
+  }
   localStorage.clear();
   sessionStorage.clear();
-
-  delete globalWindow.crypto;
 }
 
 export function removeAllPublishers(stratum: StratumService) {

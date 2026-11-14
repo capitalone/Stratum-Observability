@@ -1,4 +1,4 @@
-import type { StratumSnapshot, UserDefinedEventOptions } from '../../src/types';
+import type { StratumSnapshot, UserDefinedEventOptions } from '@types';
 import {
   AB_TEST_SCHEMA,
   CATALOG_METADATA,

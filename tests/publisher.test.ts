@@ -1,10 +1,17 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { StratumService } from '../src';
-import type { AbTest, StratumSnapshot } from '../src/types';
+import type { AbTest, StratumSnapshot } from '@types';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { StratumService } from '@';
+import {
+  AB_TEST_SCHEMA,
+  enableDebugMode,
+  PLUGIN_A_NAME,
+  type PluginA,
+  PluginAFactory,
+  PRODUCT_NAME,
+  PRODUCT_VERSION,
+  removeAllPublishers
+} from './utils';
 import { SAMPLE_A_CATALOG } from './utils/catalog';
-import { AB_TEST_SCHEMA, PRODUCT_NAME, PRODUCT_VERSION } from './utils/constants';
-import { enableDebugMode, removeAllPublishers, restoreStratumMocks } from './utils/helpers';
-import { PLUGIN_A_NAME, type PluginA, PluginAFactory } from './utils/sample-plugin';
 
 describe('event publishing', () => {
   let stratum: StratumService;
@@ -21,11 +28,6 @@ describe('event publishing', () => {
       plugins: PluginA
     });
     activeAbTest = stratum.startAbTest(AB_TEST_SCHEMA);
-  });
-
-  afterEach(() => {
-    restoreStratumMocks();
-    vi.restoreAllMocks();
   });
 
   describe('atomic publishing', () => {
