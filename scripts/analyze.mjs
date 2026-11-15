@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execSync } from 'node:child_process';
-import { readdirSync, statSync } from 'node:fs';
+import { globSync, readdirSync, rmSync, statSync } from 'node:fs';
 
 const buildDir = 'temp';
 const compressedFiles = 'artifact-*.tar.gz';
@@ -22,7 +22,9 @@ const getSize = (path) => {
 };
 
 const cleanup = () => {
-  execSync(`npx rimraf ${buildDir} ${compressedFiles}`);
+  for (const target of [buildDir, ...globSync(compressedFiles)]) {
+    rmSync(target, { recursive: true, force: true });
+  }
 };
 
 const analyzeSize = (dir, name) => {
