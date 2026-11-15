@@ -37,7 +37,6 @@ export function restoreStratumMocks() {
       Reflect.deleteProperty(globalThis, key);
     }
   }
-  localStorage.clear();
   sessionStorage.clear();
 }
 
